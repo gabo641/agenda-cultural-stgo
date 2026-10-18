@@ -38,14 +38,25 @@ details.rango label{font-size:.85rem;color:var(--mute);display:flex;gap:6px;alig
 .pie{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
 .como{font-size:.85rem;color:var(--acc);font-weight:600;text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:4px 12px;margin-top:8px;display:inline-block}
 .como:hover{text-decoration:underline}
+.fab{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:2000;background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:12px 22px;font:inherit;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer}
+
+details.filtros{margin-bottom:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:0 12px}
+details.filtros>summary{cursor:pointer;font-weight:600;padding:11px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.filtros>summary::-webkit-details-marker{display:none}
+details.filtros>summary::after{content:"▾";color:var(--mute)}details.filtros[open]>summary::after{content:"▴"}
+details.filtros[open]{padding-bottom:6px}
+#filtros-sum .n{background:var(--acc);color:#fff;border-radius:999px;font-size:.75rem;padding:1px 8px;margin-left:8px}
+#mapa{height:calc(100vh - 150px)!important;min-height:360px}
 </style></head><body><div class="wrap">
 <h1>Panoramas culturales · Santiago</h1>
 <p class="sub">Agenda unificada de espacios culturales. Datos al 2026-10-18.</p>
 <div class="bar"><input id="q" type="search" placeholder="Buscar obra, expo, lugar…" aria-label="Buscar"></div>
 <div class="bar" id="cuando" role="group" aria-label="Cuándo"></div>
+<details class="filtros" id="filtros"><summary id="filtros-sum">Filtros</summary>
 <div class="days" id="dias" role="group" aria-label="Elegir un día"></div>
 <details class="rango" id="rango"><summary>Elegir fechas</summary><div class="bar" style="margin-top:8px"><label>Desde <input type="date" id="desde"></label><label>Hasta <input type="date" id="hasta"></label></div></details>
 <div class="bar"><select id="comuna" aria-label="Comuna"></select></div><div class="cerca" id="cerca"></div><div class="bar" id="precio"></div><div class="bar" id="cats"></div>
+</details>
 <div class="bar" id="vista"></div>
 <div class="count" id="count"></div><div id="mapa" hidden></div><div id="list"></div>
 <p class="foot" id="privacidad">Tu ubicación se usa solo en tu dispositivo y no se envía a ningún servidor. Los tiempos y distancias son aproximados (línea recta); "Cómo llegar" abre Google Maps con la ruta real.</p>
@@ -96,6 +107,12 @@ function pintaCuando(){
   PRESETS.forEach(([k,label,a,b])=>{ const on=state.desde===a&&state.hasta===b;
     const x=document.createElement("button"); x.className="chip"; x.textContent=label; x.setAttribute("aria-pressed",on);
     x.onclick=()=>{state.desde=a;state.hasta=b;render()}; el.appendChild(x)});
+  if(MAPA && navigator.geolocation){   // "Cerca de mí" siempre a la vista, junto a los atajos de fecha
+    const b=document.createElement("button"); b.className="chip"; b.textContent="📍 Cerca de mí";
+    b.setAttribute("aria-pressed", !!(state.pos&&state.pos.tipo==="gps"));
+    b.onclick=()=>{ if(state.pos&&state.pos.tipo==="gps"){ state.pos=null; state.radio=null; state.orden="fecha"; render(); } else usarUbicacion(); };
+    el.appendChild(b);
+  }
   const ds=document.getElementById("dias"); ds.innerHTML="";
   for(let i=0;i<21;i++){ const s=sumar(HOY,i), g=mk(s).getDay(), on=state.desde===s&&state.hasta===s;
     const x=document.createElement("button"); x.className="day"+((g===0||g===6)?" finde":""); x.setAttribute("aria-pressed",on);
@@ -119,12 +136,6 @@ function usarUbicacion(){
 function pintaCerca(){
   const el=document.getElementById("cerca"); el.innerHTML="";
   const f1=document.createElement("div"); f1.className="fila";
-  if(MAPA && navigator.geolocation){
-    const b=document.createElement("button"); b.className="chip"; b.textContent="📍 Cerca de mí";
-    b.setAttribute("aria-pressed", !!(state.pos&&state.pos.tipo==="gps"));
-    b.onclick=()=>{ if(state.pos&&state.pos.tipo==="gps"){ state.pos=null; state.radio=null; state.orden="fecha"; render(); } else usarUbicacion(); };
-    f1.appendChild(b);
-  }
   if(METRO.length){
     const s=document.createElement("select"); s.id="metro"; s.setAttribute("aria-label","Cerca de una estación de Metro");
     s.innerHTML='<option value="">Cerca de una estación de Metro…</option>'+METRO.map((m,i)=>`<option value="${i}"${state.pos&&state.pos.tipo==="metro"&&state.pos.i===i?" selected":""}>${esc(m[0])}</option>`).join("");
@@ -150,10 +161,19 @@ function pintaCerca(){
     b.onclick=()=>{state.lugar=null; render()}; f4.appendChild(b); el.appendChild(f4);
   }
 }
+// botón flotante siempre visible (el selector antiguo quedaba enterrado bajo las categorías en el celular)
 function pintaVista(){
-  const el=document.getElementById("vista"); el.innerHTML="";
-  if(!MAPA) return;
-  chips(el,[["lista","Lista"],["mapa","Mapa"]],()=>state.vista,k=>state.vista=k);
+  document.getElementById("vista").innerHTML="";
+  let f=document.getElementById("fab");
+  if(!MAPA){ if(f) f.remove(); return; }
+  if(!f){ f=document.createElement("button"); f.id="fab"; f.className="fab"; f.type="button"; document.body.appendChild(f); }
+  const mapa=state.vista==="mapa";
+  f.textContent=mapa?"☰  Ver lista":"🗺  Ver mapa";
+  f.setAttribute("aria-label",mapa?"Volver a la lista de panoramas":"Ver los panoramas en un mapa");
+  f.onclick=()=>{ state.vista=mapa?"lista":"mapa";
+    if(state.vista==="mapa") document.getElementById("filtros").open=false;   // el mapa necesita la pantalla
+    render();
+    setTimeout(()=>{ const x=document.getElementById("count"); if(x) x.scrollIntoView({block:"start"}); },250); };
 }
 
 // ---------- mapa (Leaflet se descarga solo al abrir la pestaña "Mapa") ----------
@@ -198,6 +218,8 @@ function dibujaMapa(rows){
 
 function render(){
   pintaCuando(); pintaCerca(); pintaVista();
+  const nAct=[state.comuna, state.precio!=="todos", state.cat, state.pos, state.lugar!=null, (state.desde||state.hasta)&&!PRESETS.some(p=>p[2]===state.desde&&p[3]===state.hasta)].filter(Boolean).length;
+  document.getElementById("filtros-sum").innerHTML="Filtros"+(nAct?`<span class="n">${nAct} activo${nAct>1?"s":""}</span>`:"");
   chips(document.getElementById("precio"),[["todos","Todos"],["gratis","Gratis"],["pago","De pago"]],()=>state.precio,k=>state.precio=k);
   chips(document.getElementById("cats"),[[null,"Todas las categorías"],...Object.entries(CATS)],()=>state.cat,k=>state.cat=k);
   const q=state.q.toLowerCase();
@@ -245,6 +267,7 @@ document.getElementById("hasta").onchange=e=>{state.hasta=e.target.value||null; 
 const cs=[...new Set(DATA.map(e=>e.z).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
 const sel=document.getElementById("comuna"); sel.innerHTML='<option value="">Todas las comunas</option>'+cs.map(c=>`<option>${c}</option>`).join("");
 sel.onchange=e=>{state.comuna=e.target.value;render()};
+document.getElementById("filtros").open = window.matchMedia("(min-width:760px)").matches;
 if(!MAPA) document.getElementById("privacidad").textContent='Los tiempos y distancias son aproximados (línea recta); "Cómo llegar" abre Google Maps con la ruta real.';
 render();
 </script></body></html>
