@@ -186,8 +186,30 @@ body.vsem #dias,body.vsem #toks{display:none}
 .timbre.free{border-color:var(--olive);color:var(--olive)}.porconf{font-size:.72rem;font-style:italic;color:var(--mute);white-space:nowrap}
 .temp{height:4px;border-radius:2px;background:var(--sunk);overflow:hidden;margin:3px 0 1px;max-width:220px}.temp i{display:block;height:100%;background:var(--acc);border-radius:2px}
 .compacta .temp,.compacta .stub .cd{display:none}
+
+.gridl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}.listl{display:flex;flex-direction:column;gap:8px}
+.placa{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.placa .banda{background:var(--c);color:var(--on);height:92px;position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.placa .banda svg,.thumb svg{stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.placa .banda svg{width:150px;height:76px}
+.placa .banda::after{content:"";position:absolute;inset:6px;border:1px solid color-mix(in srgb,var(--on) 55%,transparent);border-radius:3px;pointer-events:none}
+.placa .cuerpo{padding:14px 16px;display:flex;flex-direction:column;gap:3px;text-align:center}
+.placa h3{margin:0;font-family:ui-serif,Georgia,serif;font-weight:500;font-size:1.12rem;line-height:1.2;font-variant:small-caps;letter-spacing:.6px}
+.placa .tipo{font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--mute)}
+.placa .cuenta{display:flex;align-items:baseline;justify-content:center;gap:6px;margin:8px 0 2px}.placa .cuenta b{font-family:ui-serif,Georgia,serif;font-size:2.2rem;font-weight:500;line-height:1}.placa .cuenta span{font-size:.8rem;color:var(--mute)}
+.placa .m{font-size:.78rem;color:var(--mute)}.placa .fila{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.placa .fila a,.placa .fila button{height:36px;padding:0 14px;border-radius:18px;font:inherit;font-size:.84rem;font-weight:700;display:inline-flex;align-items:center;text-decoration:none;cursor:pointer;border:0}
+.placa .fila button{background:var(--sunk);color:var(--ink)}
+.favp{position:absolute;top:8px;right:8px;width:40px;height:40px;border-radius:20px;background:color-mix(in srgb,var(--c) 40%,transparent);color:var(--on);border:0;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.favp svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linejoin:round}.favp[aria-pressed=true] svg{fill:currentColor}
+.lrow{position:relative;display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 52px 8px 8px}
+.lrow .favp{top:50%;transform:translateY(-50%);background:transparent;color:var(--ink)}
+.thumb{width:76px;height:56px;flex:0 0 76px;border:0;border-radius:4px;background:var(--c);color:var(--on);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding:0;cursor:pointer}.thumb svg{width:70px;height:36px}
+.lrow h3{margin:0;font-family:ui-serif,Georgia,serif;font-weight:500;font-size:1rem;font-variant:small-caps;letter-spacing:.4px}.lrow .nombre{border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}.lrow .m{font-size:.76rem;color:var(--mute)}
+nav.conic button svg{width:28px;height:28px}
+.lnk{display:block;margin:10px 0 0;border:0;background:none;color:var(--acc2);font:inherit;font-size:.85rem;font-weight:600;padding:6px 0;cursor:pointer;text-align:left}
+.fbanda{background:var(--c);color:var(--on);height:112px;border-radius:6px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;position:relative;margin:4px 0 12px}.fbanda svg{width:170px;height:86px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.fbanda::after{content:"";position:absolute;inset:6px;border:1px solid color-mix(in srgb,var(--on) 55%,transparent);border-radius:3px;pointer-events:none}
 </style></head><body><div class="wrap">
-<header id="cab"><div class="eyebrow" id="semana"></div><h1>Cartelera</h1></header>
+<header id="cab"><div class="eyebrow" id="semana"></div><h1 id="titulo">Cartelera</h1></header>
 <div id="controles">
 <div class="fila-busca"><label class="busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="¿Qué quieres vivir? Ej: jazz el viernes" aria-label="Buscar"></label>
 <button class="btn-filtros" id="btnfiltros" type="button" aria-label="Abrir filtros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span class="n" id="nfiltros" hidden></span></button></div>
@@ -296,13 +318,14 @@ function infoFecha(e,dd){
 }
 
 // ---------- barra de pestañas ----------
-const IC_LISTA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="18" r="1" fill="currentColor"/></svg>';
-const IC_LUG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9l8-5 8 5v11M4 20h16M10 20v-6h4v6"/></svg>';
+const IC_LISTA='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h3.5a2.5 2.5 0 0 0 5 0H26a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H14.5a2.5 2.5 0 0 0-5 0H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/><path d="M12 11v1.5M12 15.2v1.6M12 19.5V21" /><path d="M18 13h6M18 17h4"/></svg>';
+const IC_LUG='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12 16 4l12 8zM7 14v10M13 14v10M19 14v10M25 14v10M4 26h24"/></svg>';
 const IC_PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
 function pintaTabs(){
   const nav=document.getElementById("tabs");
   if(!MAPA){ nav.hidden=true; return; }
   nav.hidden=false;
+  nav.classList.add("conic");
   nav.innerHTML=[["cartelera","Cartelera",IC_LISTA],["mapa","Mapa",IC_PIN],["lugares","Lugares",IC_LUG]].map(([k,l,ic])=>`<button type="button" data-t="${k}"${state.tab===k?' aria-current="page"':""}>${ic}<span>${l}</span></button>`).join("");
   nav.querySelectorAll("button").forEach(b=>b.onclick=()=>irTab(b.dataset.t));
 }
@@ -506,8 +529,9 @@ function pintaHoja(){
       <h3>${esc(L0.n)}</h3>
       <p class="sub2">${evs.length} panorama${evs.length>1?"s":""}${d!=null?` · a ${kmTxt(d)}`:""}${L0.md<=1500?` · 🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}`:""}</p>
       <ul>${evs.slice(0,6).map(([e,dd])=>{const [p,cl]=priceOf(e); return `<li><a href="${esc(e.u)}" target="_blank" rel="noopener"><span class="cuando">${infoFecha(e,dd)}</span><span class="tit">${esc(e.t)}</span><span class="pr price ${cl}">${p}</span></a></li>`}).join("")}${evs.length>6?`<li><span class="cuando">…y ${evs.length-6} más: míralos en la Cartelera</span></li>`:""}</ul>
-      <div class="acc"><a class="como" href="${GM}${L0.lat},${L0.lon}" target="_blank" rel="noopener">Cómo llegar</a><button class="sec" id="vercart" type="button">Ver en la cartelera</button></div></div>`;
+      <div class="acc"><a class="como" href="${GM}${L0.lat},${L0.lon}" target="_blank" rel="noopener">Cómo llegar</a><button class="sec" id="verficha" type="button">Ver ficha del lugar</button></div><button class="lnk" id="vercart" type="button">Ver solo este lugar en la Cartelera →</button></div>`;
     document.getElementById("atras").onclick=()=>{ state.sel=null; estiloMarcas(); pintaHoja(); };
+    document.getElementById("verficha").onclick=()=>{ state.ficha=state.sel; state.tab="lugares"; try{ history.replaceState(null,"","#lugar="+state.ficha); }catch(e){} render(); window.scrollTo(0,0); };
     document.getElementById("vercart").onclick=()=>{ state.lugar=state.sel; state.tab="cartelera"; render(); window.scrollTo(0,0); };
     return;
   }
@@ -715,24 +739,46 @@ function fichaLugar(i){
   rows.sort((x,y)=>{const a=claveR(x),b=claveR(y);return a<b?-1:a>b?1:0}); FILAS=rows;
   const fav=PREF.lugares.has(i);
   const h=`<button type="button" class="back" id="fback">← Todos los lugares</button>
-   <div class="ficha-l" style="--c:var(${tp(L0.t).c})">${insignia(L0.t,44)}<div><h2>${esc(L0.n)}</h2><div class="tkm">${tp(L0.t).s}${L0.z?" · "+esc(L0.z):""}${L0.md<=1500?` · 🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}`:""}</div>
+   <div class="fbanda" style="--c:var(${tp(L0.t).c});--on:${tp(L0.t).on}">${fachada(L0.t)}</div>
+   <div class="ficha-l"><div><h2>${esc(L0.n)}</h2><div class="tkm">${tp(L0.t).s}${L0.z?" · "+esc(L0.z):""}${L0.md<=1500?` · 🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}`:""}</div>
    <div class="acc2"><a class="como" href="${GM}${L0.lat},${L0.lon}" target="_blank" rel="noopener">Cómo llegar</a><button type="button" id="ffav" aria-pressed="${fav}">${fav?"★ En mis lugares":"☆ Agregar a mis lugares"}</button><button type="button" id="fcomp">Compartir</button></div></div></div>`;
   return {rows, html:h+(rows.length?`<div class="sec-h"><h2>Próximos <i>panoramas</i></h2><p>${rows.length} en este lugar</p></div>`+rows.map((r,k)=>tarjeta(r,k)).join(""):`<div class="vacio"><h3>Telón abajo</h3><p>No hay panoramas próximos en este lugar.</p></div>`)};
 }
 
 // ---------- pestaña Lugares: directorio de recintos con panoramas próximos ----------
+const FACH={
+ museo:"M20 30 75 8l55 22zM28 34h94M36 38v26M56 38v26M76 38v26M96 38v26M116 38v26M24 66h102M18 71h114",
+ teatro:"M26 70V30c0-18 98-18 98 0v40M26 70h98M44 70V34M106 70V34M44 34c8-3 14 6 14 36M106 34c-8-3-14 6-14 36M75 14v12M62 70V48a13 13 0 0 1 26 0v22",
+ centro:"M22 70V36l53-22 53 22v34M22 70h106M64 70V48h22v22M34 46h10v10H34zM106 46h10v10h-10zM62 22V12h26v10",
+ galeria:"M20 70V28h110v42M20 70h110M32 34h38v28H32zM80 34h38v28H80zM40 46l9-8 8 8 6-5M88 46l9-8 8 8",
+ biblioteca:"M24 70V26h102v44M24 70h102M18 76h114M38 70V34M52 70V34M66 70V34M80 70V34M94 70V34M108 70V34M24 26 75 10l51 16",
+ cine:"M20 70V34h110v36M20 70h110M30 22h90v12H30zM38 28h2M50 28h2M62 28h2M74 28h2M86 28h2M98 28h2M110 28h2M62 70V48h26v22",
+ musica:"M18 70V30c0-10 114-10 114 0v40M18 70h114M32 70V44a8 8 0 0 1 16 0v26M67 70V44a8 8 0 0 1 16 0v26M102 70V44a8 8 0 0 1 16 0v26",
+ aire:"M30 70h90M40 70V40M110 70V40M30 40h90l-45-24zM75 40v30M60 70V54h30v16",
+ otro:"M30 70V28h90v42M30 70h90M44 40h14v12H44zM92 40h14v12H92zM66 70V52h18v18"
+};
+const fachada=t=>`<svg viewBox="0 0 150 76" aria-hidden="true"><path d="${FACH[t]||FACH.otro}"/></svg>`;
+state.vistaL=state.vistaL||"placas"; state.soloFav=state.soloFav||false;
 function pintaLugares(){
   const cont=document.getElementById("lugares"), q=nn(state.q.trim());
   const cuenta=new Map();
   for(const e of DATA){ if(e.p==null||e.c.includes("otros")||!dias(e,null,null)) continue; cuenta.set(e.p,(cuenta.get(e.p)||0)+1); }
-  let ls=[...cuenta.entries()].map(([i,n])=>({i,n,L:LUG[i],d:distLug(i)})).filter(x=>(!state.tipo||x.L.t===state.tipo)&&(!q||nn(x.L.n+" "+(x.L.z||"")).includes(q)));
+  let ls=[...cuenta.entries()].map(([i,n])=>({i,n,L:LUG[i],d:distLug(i)})).filter(x=>(!state.tipo||x.L.t===state.tipo)&&(!state.comuna||x.L.z===state.comuna)&&(!state.soloFav||PREF.lugares.has(x.i))&&(!q||nn(x.L.n+" "+(x.L.z||"")+" "+tp(x.L.t).s).includes(q)));
   ls.sort((a,b)=>(PREF.lugares.has(b.i)-PREF.lugares.has(a.i))||(state.pos&&a.d!=null&&b.d!=null?a.d-b.d:b.n-a.n||a.L.n.localeCompare(b.L.n,"es")));
-  document.getElementById("count").innerHTML=`<span class="num">${ls.length}</span> lugar${ls.length===1?"":"es"} con panoramas próximos`;
-  cont.innerHTML=ls.map(x=>`<article class="lg" style="--c:var(${tp(x.L.t).c})">${insignia(x.L.t,34)}<div style="flex:1"><h3><a href="#lugar=${x.i}" data-fi="${x.i}" style="color:inherit;text-decoration:none">${esc(x.L.n)}</a></h3>
-    <div class="lm">${tp(x.L.t).s}${x.L.z?" · "+esc(x.L.z):""}${x.d!=null?" · a "+kmTxt(x.d):""}</div>
-    <div class="lm">${x.n} panorama${x.n>1?"s":""} próximo${x.n>1?"s":""}${x.L.md<=1500?` · 🚇 ~${kmTxt(x.L.md)} del Metro ${esc(x.L.m)}`:""}</div>
-    <div class="la"><a class="como" href="${GM}${x.L.lat},${x.L.lon}" target="_blank" rel="noopener">Cómo llegar</a><button type="button" data-i="${x.i}">Ver ficha</button></div></div><button type="button" class="ibtn fav" data-f="${x.i}" aria-pressed="${PREF.lugares.has(x.i)}" aria-label="${PREF.lugares.has(x.i)?"Quitar de mis lugares":"Agregar a mis lugares"}">${IC_GUARD}</button></article>`).join("")
-    ||'<div class="vacio"><h3>Sin lugares</h3><p>No hay recintos que calcen con esa búsqueda.</p></div>';
+  document.getElementById("count").innerHTML=`<span class="num">${ls.length}</span> lugar${ls.length===1?"":"es"} con panoramas próximos`+(state.comuna?" · "+esc(state.comuna):"");
+  const fav=x=>`<button type="button" class="favp" data-f="${x.i}" aria-pressed="${PREF.lugares.has(x.i)}" aria-label="${PREF.lugares.has(x.i)?"Quitar de mis lugares":"Agregar a mis lugares"}">${IC_GUARD}</button>`;
+  const metro=x=>x.L.md<=1500?`🚇 ~${kmTxt(x.L.md)} del Metro ${esc(x.L.m)}`:"";
+  const placa=x=>`<article class="placa" style="--c:var(${tp(x.L.t).c});--on:${tp(x.L.t).on}"><div class="banda">${fachada(x.L.t)}</div>${fav(x)}
+    <div class="cuerpo"><span class="tipo">${tp(x.L.t).s}${x.L.z?" · "+esc(x.L.z):""}</span><h3>${esc(x.L.n)}</h3>
+    <div class="cuenta"><b>${x.n}</b><span>panorama${x.n>1?"s":""} próximo${x.n>1?"s":""}</span></div>
+    <div class="m">${metro(x)}${x.d!=null?(metro(x)?" · ":"")+"a "+kmTxt(x.d):""}</div>
+    <div class="fila"><a class="como" href="${GM}${x.L.lat},${x.L.lon}" target="_blank" rel="noopener">Cómo llegar</a><button type="button" data-i="${x.i}">Ver ficha</button></div></div></article>`;
+  const fila=x=>`<article class="lrow" style="--c:var(${tp(x.L.t).c});--on:${tp(x.L.t).on}"><button type="button" class="thumb" data-i="${x.i}" aria-label="Ver ficha de ${esc(x.L.n)}">${fachada(x.L.t)}</button>
+    <div class="lcol"><h3><button type="button" class="nombre" data-i="${x.i}">${esc(x.L.n)}</button></h3><div class="m">${tp(x.L.t).s}${x.L.z?" · "+esc(x.L.z):""}</div><div class="m">${x.n} panorama${x.n>1?"s":""}${metro(x)?" · "+metro(x):""}${x.d!=null?" · a "+kmTxt(x.d):""}</div></div>${fav(x)}</article>`;
+  const ctl=`<div class="vistas"><div class="seg"><button type="button" data-vl="placas" aria-pressed="${state.vistaL==="placas"}">Placas</button><button type="button" data-vl="lista" aria-pressed="${state.vistaL==="lista"}">Lista</button></div><button type="button" class="dens" id="sfav" aria-pressed="${state.soloFav}">★ Mis lugares${PREF.lugares.size?" ("+PREF.lugares.size+")":""}</button></div>`;
+  cont.innerHTML=ctl+(ls.length?`<div class="${state.vistaL==="placas"?"gridl":"listl"}">${ls.map(state.vistaL==="placas"?placa:fila).join("")}</div>`:'<div class="vacio"><h3>Sin lugares</h3><p>No hay recintos que calcen con esa búsqueda.</p></div>');
+  cont.querySelectorAll("button[data-vl]").forEach(b=>b.onclick=()=>{ state.vistaL=b.dataset.vl; pintaLugares(); });
+  document.getElementById("sfav").onclick=()=>{ state.soloFav=!state.soloFav; pintaLugares(); };
   cont.querySelectorAll("button[data-f]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.f; PREF.lugares.has(i)?PREF.lugares.delete(i):PREF.lugares.add(i); guardaPref(); pintaLugares(); });
   cont.querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>{ state.ficha=+b.dataset.i; try{ history.replaceState(null,"","#lugar="+state.ficha); }catch(e){} render(); window.scrollTo(0,0); });
 }
@@ -759,7 +805,9 @@ function calcRows(sinFecha){
 }
 function render(){
   EF=efectivos();
-  document.getElementById("semana").textContent="Semana del "+fmt(HOY)+" al "+fmt(sumar(HOY,6));
+  { const tb=MAPA?state.tab:"cartelera";
+    document.getElementById("semana").textContent=tb==="lugares"?"Recintos con panoramas próximos":tb==="mapa"?"Panoramas cerca de ti":"Semana del "+fmt(HOY)+" al "+fmt(sumar(HOY,6));
+    document.getElementById("titulo").textContent=tb==="lugares"?"Lugares":tb==="mapa"?"Mapa":"Cartelera"; }
   pintaCuando(); pintaTipos(); pintaCerca(); pintaTabs(); pintaToks(); pintaGustos(); pintaFranjas(); pintaVistas();
   document.getElementById("vistas").hidden=!(state.tab==="cartelera"||!MAPA);
   chips(document.getElementById("precio"),[["todos","Todos"],["gratis","Gratis"],["pago","De pago"]],()=>state.precio,k=>state.precio=k);
