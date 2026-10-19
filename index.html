@@ -131,7 +131,9 @@ details.cal>summary::-webkit-details-marker{display:none}
 .idea{height:34px;padding:0 12px;border-radius:17px;border:1px dashed var(--mute);background:transparent;color:var(--ink);font:inherit;font-size:.82rem;font-weight:500;cursor:pointer}
 .day{min-width:58px;padding:7px 4px}.day .cn{font-size:.62rem;font-weight:700;letter-spacing:0}.day.sinev{opacity:.55}.day.todo{min-width:60px}
 .tk{display:flex;position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;margin-bottom:12px}
-.tk{-webkit-mask:radial-gradient(circle 8px at 76px 0,#0000 96%,#000),radial-gradient(circle 8px at 76px 100%,#0000 96%,#000);-webkit-mask-composite:source-in;mask:radial-gradient(circle 8px at 76px 0,#0000 96%,#000),radial-gradient(circle 8px at 76px 100%,#0000 96%,#000);mask-composite:intersect}
+.tk{-webkit-mask:radial-gradient(circle 9px at 76px 0,#0000 98%,#000),radial-gradient(circle 9px at 76px 100%,#0000 98%,#000);-webkit-mask-composite:source-in;mask:radial-gradient(circle 9px at 76px 0,#0000 98%,#000),radial-gradient(circle 9px at 76px 100%,#0000 98%,#000);mask-composite:intersect}
+.tk::before,.tk::after{content:"";position:absolute;left:67px;width:18px;height:9px;box-sizing:border-box;border:1.5px solid var(--mute);pointer-events:none}
+.tk::before{top:-1px;border-top:0;border-radius:0 0 9px 9px}.tk::after{bottom:-1px;border-bottom:0;border-radius:9px 9px 0 0}
 .stub{width:76px;flex:0 0 76px;box-sizing:border-box;background:var(--sunk);background:color-mix(in srgb,var(--c) 15%,var(--surface));border-radius:17px 0 0 17px;border-right:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:14px 0;color:var(--c)}
 .stub .t{font-size:.7rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:color-mix(in srgb,var(--c) 50%,var(--ink))}
 .stub .g{font-family:ui-serif,"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:2rem;font-weight:500;line-height:1;color:var(--ink)}
