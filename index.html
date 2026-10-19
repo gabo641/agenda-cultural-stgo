@@ -24,12 +24,27 @@ input[type=search]{flex:1 1 220px;padding:12px 14px;border:1px solid var(--line)
 .day.finde small{color:var(--acc)}.day.finde[aria-pressed=true] small{color:var(--bg)}
 details.rango{margin-bottom:10px}details.rango summary{cursor:pointer;color:var(--mute);font-size:.9rem}
 details.rango label{font-size:.85rem;color:var(--mute);display:flex;gap:6px;align-items:center}
-details.filtros{margin-bottom:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:0 12px}
-details.filtros>summary{cursor:pointer;font-weight:600;padding:11px 0;list-style:none;display:flex;justify-content:space-between;align-items:center}
-details.filtros>summary::-webkit-details-marker{display:none}
-details.filtros>summary::after{content:"▾";color:var(--mute)}details.filtros[open]>summary::after{content:"▴"}
-details.filtros[open]{padding-bottom:6px}
-#filtros-sum .n{background:var(--acc);color:var(--on-acc);border-radius:999px;font-size:.75rem;padding:1px 8px;margin-left:8px}
+.busca{flex:1;display:flex;align-items:center;gap:10px;height:50px;padding:0 16px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line)}
+.busca svg{width:20px;height:20px;flex:0 0 auto;color:var(--mute)}
+.busca input{border:0;outline:0;background:transparent;font:inherit;color:var(--ink);width:100%;min-width:0;padding:0;box-shadow:none}
+.fila-busca{display:flex;gap:10px;margin-bottom:10px}
+.btn-filtros{position:relative;width:50px;height:50px;flex:0 0 auto;border-radius:16px;border:0;background:var(--ink);color:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
+.btn-filtros svg{width:22px;height:22px}
+.btn-filtros .n{position:absolute;top:-5px;right:-5px;min-width:20px;height:20px;border-radius:10px;background:var(--acc);color:var(--on-acc);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid var(--bg)}
+.chips-h{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.chips-h::-webkit-scrollbar{display:none}.chips-h .chip{flex:0 0 auto;white-space:nowrap}
+/* ---- panel de filtros superpuesto ---- */
+.panel{position:fixed;inset:0;z-index:3000;display:flex;align-items:flex-end;justify-content:center;background:rgba(29,26,22,.45)}
+.panel-in{background:var(--surface);width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25)}
+.panel header{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 6px}
+.panel header h2{margin:0;font-size:1.2rem}
+.cerrar{border:0;background:var(--sunk);color:var(--ink);width:36px;height:36px;border-radius:18px;font-size:1rem;cursor:pointer}
+#panel-body{overflow:auto;padding:0 18px 8px;-webkit-overflow-scrolling:touch}
+.sect{margin:12px 0 4px}.sect h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:0 0 8px;font-family:inherit;font-weight:700}
+.panel footer{display:flex;gap:10px;padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}
+.panel footer .como{flex:1;text-align:center;border:0;cursor:pointer;font:inherit;font-weight:600;margin:0;padding:12px 14px}
+.panel footer .sec{padding:12px 16px}
+@media(min-width:760px){.panel{align-items:center}.panel-in{border-radius:22px;max-height:84vh}}
 .aviso{color:var(--mute);font-size:.85rem;margin:0}.aviso.mal{color:var(--acc)}
 .cerca{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}.cerca .fila{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.cerca small{color:var(--mute);font-size:.8rem}
 .count{color:var(--mute);font-size:.9rem;margin:8px 0 12px}
@@ -70,18 +85,36 @@ details.filtros[open]{padding-bottom:6px}
 .ficha li .cuando{font-size:.85rem;color:var(--mute)}.ficha li .tit{font-weight:600}.ficha li .pr{font-size:.82rem;font-weight:600}
 .ficha .acc{display:flex;gap:10px;flex-wrap:wrap}.ficha .acc .como{margin-top:0}
 .atras{border:0;background:transparent;color:var(--acc);font:inherit;font-weight:600;cursor:pointer;padding:0 0 6px}
-.vmapa #cab,.vmapa .foot{display:none}
+.vmapa #cab,.vmapa .foot,.vmapa .count{display:none}
+/* mapa a pantalla completa con los controles flotando encima (como en el diseño) */
+html:has(body.vmapa),body.vmapa{overflow:hidden;height:100%}
+.vmapa .wrap{padding:0;max-width:none}
+.vmapa #mapawrap{position:fixed;left:0;right:0;top:0;bottom:var(--tabh,64px);border:0;border-radius:0;margin:0;height:auto!important;z-index:1}
+.vmapa #controles{position:fixed;left:0;right:0;top:0;z-index:1500;padding:12px 12px 0;pointer-events:none}
+.vmapa #controles>*{pointer-events:auto}
+.vmapa #controles .chip{box-shadow:var(--shadow)}
+.leaflet-top.leaflet-right{margin-top:112px}
+@media(min-width:760px){.vmapa #controles{right:auto;width:480px;left:16px}}
 @media(min-width:760px){.hoja{left:12px;right:auto;bottom:12px;width:360px;max-height:calc(100% - 24px);border-radius:18px;transform:none}.hoja .asa{cursor:default}}
 </style></head><body><div class="wrap">
 <header id="cab"><h1>Panoramas culturales · Santiago</h1>
 <p class="sub">Agenda unificada de espacios culturales. Datos al 2026-10-19.</p></header>
-<div class="bar"><input id="q" type="search" placeholder="Buscar obra, expo, lugar…" aria-label="Buscar"></div>
-<div class="bar" id="cuando" role="group" aria-label="Cuándo"></div>
-<details class="filtros" id="filtros"><summary id="filtros-sum">Filtros</summary>
-<div class="days" id="dias" role="group" aria-label="Elegir un día"></div>
-<details class="rango" id="rango"><summary>Elegir fechas</summary><div class="bar" style="margin-top:8px"><label>Desde <input type="date" id="desde"></label><label>Hasta <input type="date" id="hasta"></label></div></details>
-<div class="bar"><select id="comuna" aria-label="Comuna"></select></div><div class="cerca" id="cerca"></div><div class="bar" id="precio"></div><div class="bar" id="cats"></div>
-</details>
+<div id="controles">
+<div class="fila-busca"><label class="busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Buscar obra, expo, lugar…" aria-label="Buscar"></label>
+<button class="btn-filtros" id="btnfiltros" type="button" aria-label="Abrir filtros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span class="n" id="nfiltros" hidden></span></button></div>
+<div class="bar chips-h" id="cuando" role="group" aria-label="Cuándo"></div>
+</div>
+<div class="panel" id="panel" hidden><div class="panel-in" role="dialog" aria-modal="true" aria-label="Filtros">
+<header><h2>Filtros</h2><button class="cerrar" id="cerrarpanel" type="button" aria-label="Cerrar filtros">✕</button></header>
+<div id="panel-body">
+<div class="sect"><h3>Cuándo</h3><div class="days" id="dias" role="group" aria-label="Elegir un día"></div>
+<details class="rango" id="rango"><summary>Elegir fechas</summary><div class="bar" style="margin-top:8px"><label>Desde <input type="date" id="desde"></label><label>Hasta <input type="date" id="hasta"></label></div></details></div>
+<div class="sect"><h3>Dónde</h3><div class="bar"><select id="comuna" aria-label="Comuna"></select></div><div class="cerca" id="cerca"></div></div>
+<div class="sect"><h3>Precio</h3><div class="bar" id="precio"></div></div>
+<div class="sect"><h3>Tipo de arte</h3><div class="bar" id="cats"></div></div>
+</div>
+<footer><button class="sec" id="limpiar" type="button">Limpiar</button><button class="como" id="aplicar" type="button">Ver panoramas</button></footer>
+</div></div>
 <div class="count" id="count"></div>
 <div id="mapawrap" hidden><div id="mapa"></div>
 <section class="hoja" id="hoja" aria-label="Lugares con panoramas"><button class="asa" id="asa" type="button" aria-label="Expandir o contraer el panel de lugares"><i></i><span id="hoja-res"></span></button><div id="hoja-cont"></div></section></div>
@@ -155,14 +188,11 @@ function pintaTabs(){
 function irTab(t){
   if(t===state.tab) return;
   state.tab=t;
-  if(t==="mapa"){ document.getElementById("filtros").open=false; state.lugar=null; state.sel=null; state.hoja="peek"; }
+  if(t==="mapa"){ cerrarPanel(); state.lugar=null; state.sel=null; state.hoja="peek"; }
   render(); window.scrollTo(0,0);
   if(t==="mapa") setTimeout(()=>{ ajustaAltoMapa(); if(MAPOBJ) MAPOBJ.invalidateSize(); },30);
 }
-function ajustaAltoMapa(){
-  const w=document.getElementById("mapawrap"), tabs=document.getElementById("tabs").offsetHeight;
-  w.style.height=Math.max(360, innerHeight - w.getBoundingClientRect().top - tabs - 12)+"px";
-}
+function ajustaAltoMapa(){ document.documentElement.style.setProperty("--tabh", document.getElementById("tabs").offsetHeight+"px"); }
 addEventListener("resize",()=>{ if(state.tab==="mapa"){ ajustaAltoMapa(); if(MAPOBJ) MAPOBJ.invalidateSize(); } });
 
 function pintaCuando(){
@@ -176,6 +206,8 @@ function pintaCuando(){
     b.onclick=()=>{ if(state.pos&&state.pos.tipo==="gps"){ state.pos=null; state.radio=null; state.orden="fecha"; render(); } else usarUbicacion(); };
     el.appendChild(b);
   }
+  const g=document.createElement("button"); g.className="chip"; g.textContent="Gratis"; g.setAttribute("aria-pressed",state.precio==="gratis");
+  g.onclick=()=>{ state.precio=state.precio==="gratis"?"todos":"gratis"; render(); }; el.appendChild(g);
   const ds=document.getElementById("dias"); ds.innerHTML="";
   for(let i=0;i<21;i++){ const s=sumar(HOY,i), g=mk(s).getDay(), on=state.desde===s&&state.hasta===s;
     const x=document.createElement("button"); x.className="day"+((g===0||g===6)?" finde":""); x.setAttribute("aria-pressed",on);
@@ -250,7 +282,8 @@ function dibujaMapa(rows){
   const cont=document.getElementById("mapa");
   if(!MAPOBJ){
     cont.textContent="";
-    MAPOBJ=L.map(cont,{preferCanvas:true,zoomControl:true,attributionControl:false}).setView([-33.45,-70.65],11);
+    MAPOBJ=L.map(cont,{preferCanvas:true,zoomControl:false,attributionControl:false}).setView([-33.45,-70.65],11);
+    if(!matchMedia("(pointer:coarse)").matches) L.control.zoom({position:"bottomright"}).addTo(MAPOBJ);   // en el celular se usa el pellizco
     L.control.attribution({position:"topright",prefix:false}).addAttribution("© OpenStreetMap").addTo(MAPOBJ);
     L.tileLayer(TILES,{maxZoom:19}).addTo(MAPOBJ);
     CAPA=L.layerGroup().addTo(MAPOBJ);
@@ -266,7 +299,10 @@ function dibujaMapa(rows){
   if(state.pos){ MARCA_POS=L.circleMarker([state.pos.lat,state.pos.lon],{radius:8,color:css("--surface"),weight:3,fillColor:css("--navy"),fillOpacity:1}).bindTooltip("Desde: "+state.pos.nombre).addTo(MAPOBJ); pts.push([state.pos.lat,state.pos.lon]); }
   estiloMarcas();
   if(state.sel!=null){ const L0=LUG[state.sel]; MAPOBJ.setView([L0.lat,L0.lon],Math.max(MAPOBJ.getZoom(),14)); }
-  else if(pts.length) MAPOBJ.fitBounds(pts,{padding:[30,30],maxZoom:15});
+  else if(pts.length){   // se encuadra el núcleo del Gran Santiago: unos pocos lugares lejanos (Melipilla, Talagante…) no deben alejar el mapa
+    const centro=pts.filter(p=>p[0]>-33.65&&p[0]<-33.30&&p[1]>-70.80&&p[1]<-70.45);
+    MAPOBJ.fitBounds(centro.length?centro:pts,{padding:[30,30],maxZoom:14});
+  }
   pintaHoja();
 }
 const claveR=([e,dd])=>dd.ini+" "+(((e.hm&&e.hm[dd.ini])||e.h||"99").slice(0,5));
@@ -316,7 +352,7 @@ function render(){
   chips(document.getElementById("precio"),[["todos","Todos"],["gratis","Gratis"],["pago","De pago"]],()=>state.precio,k=>state.precio=k);
   chips(document.getElementById("cats"),[[null,"Todas las categorías"],...Object.entries(CATS)],()=>state.cat,k=>state.cat=k);
   const nAct=[state.comuna, state.precio!=="todos", state.cat, state.pos, state.lugar!=null, (state.desde||state.hasta)&&!PRESETS.some(p=>p[2]===state.desde&&p[3]===state.hasta)].filter(Boolean).length;
-  document.getElementById("filtros-sum").innerHTML="Filtros"+(nAct?`<span class="n">${nAct} activo${nAct>1?"s":""}</span>`:"");
+  const nb=document.getElementById("nfiltros"); nb.hidden=!nAct; nb.textContent=nAct;
   const {rows,sinUbic}=calcRows();
   if(state.pos&&state.orden==="cerca") rows.sort((x,y)=>{ const a=x[2]==null?1e12:x[2], b=y[2]==null?1e12:y[2]; return a-b || (claveR(x)<claveR(y)?-1:1); });
   else rows.sort((x,y)=>{const a=claveR(x),b=claveR(y);return a<b?-1:a>b?1:0});
@@ -324,6 +360,7 @@ function render(){
   const ventana=!filtrando?"":state.desde&&state.hasta?(state.desde===state.hasta?` · ${fmtD(state.desde)}`:` · ${fmt(state.desde)} al ${fmt(state.hasta)}`):state.desde?` · desde ${fmt(state.desde)}`:` · hasta ${fmt(state.hasta)}`;
   const radioTxt=state.pos&&state.radio?` · a menos de ${state.radio} km de ${state.pos.nombre}`:"";
   document.getElementById("count").textContent=`${rows.length} panoramas${ventana}${radioTxt}`+(sinUbic?` · ${sinUbic} sin ubicación precisa no se incluyen`:"");
+  document.getElementById("aplicar").textContent=`Ver ${rows.length} panorama${rows.length===1?"":"s"}`;
   const vm=MAPA&&state.tab==="mapa";
   document.body.classList.toggle("vmapa",vm);
   document.getElementById("mapawrap").hidden=!vm; document.getElementById("list").hidden=vm;
@@ -342,7 +379,43 @@ document.getElementById("hasta").onchange=e=>{state.hasta=e.target.value||null; 
 const cs=[...new Set(DATA.map(e=>e.z).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
 const sel=document.getElementById("comuna"); sel.innerHTML='<option value="">Todas las comunas</option>'+cs.map(c=>`<option>${c}</option>`).join("");
 sel.onchange=e=>{state.comuna=e.target.value;render()};
-document.getElementById("filtros").open = matchMedia("(min-width:760px)").matches;
 if(!MAPA) document.getElementById("privacidad").textContent='Los tiempos y distancias son aproximados (línea recta); "Cómo llegar" abre Google Maps con la ruta real.';
+
+// ---------- panel de filtros superpuesto ----------
+let FOCO_PREVIO=null;
+function abrirPanel(){ FOCO_PREVIO=document.activeElement; document.getElementById("panel").hidden=false; document.getElementById("cerrarpanel").focus(); }
+function cerrarPanel(){ const p=document.getElementById("panel"); if(p.hidden) return; p.hidden=true; if(FOCO_PREVIO&&FOCO_PREVIO.focus) FOCO_PREVIO.focus(); }
+document.getElementById("btnfiltros").onclick=abrirPanel;
+document.getElementById("cerrarpanel").onclick=cerrarPanel;
+document.getElementById("aplicar").onclick=cerrarPanel;
+document.getElementById("panel").onclick=e=>{ if(e.target.id==="panel") cerrarPanel(); };
+addEventListener("keydown",e=>{ if(e.key==="Escape") cerrarPanel(); });
+document.getElementById("limpiar").onclick=()=>{ Object.assign(state,{precio:"todos",cat:null,comuna:"",desde:null,hasta:null,pos:null,radio:null,orden:"fecha",lugar:null,aviso:""}); document.getElementById("comuna").value=""; render(); };
+
+// ---------- panel inferior del mapa: se arrastra con el dedo ----------
+(function(){
+  const h=document.getElementById("hoja"), cont=document.getElementById("hoja-cont");
+  let y0=0, dy=0, drag=false, activo=false, base=0;
+  const recogido=()=>h.offsetHeight-52;
+  const ancho=()=>matchMedia("(min-width:760px)").matches;
+  h.addEventListener("touchstart",e=>{ if(ancho()) return; y0=e.touches[0].clientY; dy=0; drag=false; activo=true; },{passive:true});
+  h.addEventListener("touchmove",e=>{
+    if(!activo) return; dy=e.touches[0].clientY-y0;
+    const abierta=state.hoja==="media";
+    if(!drag){
+      const enAsa=!!e.target.closest("#asa");
+      if(abierta&&dy>8&&(cont.scrollTop<=0||enAsa)) drag=true;     // bajar: solo si el contenido está arriba (si no, es scroll)
+      else if(!abierta&&dy<-8) drag=true;                          // subir desde el panel recogido
+      if(!drag) return;
+      h.style.transition="none"; base=abierta?0:recogido();
+    }
+    e.preventDefault();
+    h.style.transform=`translateY(${Math.min(recogido(),Math.max(0,base+dy))}px)`;
+  },{passive:false});
+  const fin=()=>{ if(!activo) return; activo=false; if(!drag) return; drag=false; h.style.transition=""; h.style.transform="";
+    if(state.hoja==="media"&&dy>70) state.hoja="peek"; else if(state.hoja==="peek"&&dy<-50) state.hoja="media";
+    pintaHoja(); };
+  h.addEventListener("touchend",fin); h.addEventListener("touchcancel",fin);
+})();
 render();
 </script></body></html>
