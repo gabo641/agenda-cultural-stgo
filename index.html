@@ -71,9 +71,7 @@ details.rango label{font-size:.85rem;color:var(--mute);display:flex;gap:6px;alig
 @media(min-width:760px){.tabs{left:50%;right:auto;bottom:16px;transform:translateX(-50%);width:300px;border:1px solid var(--line);border-radius:999px;padding:4px 10px}}
 /* ---- mapa con panel inferior ---- */
 #mapawrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--sunk);margin-bottom:8px}
-#mapa{position:absolute;inset:0}.leaflet-marker-icon:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:50%}
-.leaflet-tile-pane{filter:sepia(.28) saturate(.8) hue-rotate(-8deg) brightness(1.03) contrast(.96)}
-@media(prefers-color-scheme:dark){.leaflet-tile-pane{filter:invert(1) hue-rotate(190deg) brightness(.82) contrast(.9) saturate(.55)}}
+#mapa{position:absolute;inset:0}.leaflet-top.leaflet-right{margin-top:calc(var(--ctrlh,0px) + 2px)}.leaflet-control-attribution{font-size:.65rem}.leaflet-marker-icon:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:50%}
 .hoja{position:absolute;left:0;right:0;bottom:0;z-index:1100;max-height:min(64%,calc(100% - var(--ctrlh,140px) - 16px));display:flex;flex-direction:column;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:0 -8px 24px rgba(29,26,22,.18);transform:translateY(calc(100% - 52px));transition:transform .25s ease}
 .hoja.abierta{transform:none}
 .asa{border:0;background:transparent;padding:10px 0 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;color:var(--mute);font:inherit}
@@ -197,6 +195,7 @@ details.cal>summary::-webkit-details-marker{display:none}
 <div id="list"></div>
 <p class="foot" id="privacidad">Tu ubicación se usa solo en tu dispositivo y no se envía a ningún servidor. Los tiempos y distancias son aproximados (línea recta); "Cómo llegar" abre Google Maps con la ruta real.</p>
 <p class="foot" id="instalar">Para tenerla como app: en iPhone (Safari) toca Compartir → «Agregar a inicio»; en Android (Chrome) abre el menú ⋮ → «Instalar app».</p>
+
 <p class="foot">Datos al 2026-10-19. Fechas y precios extraídos automáticamente: verifica siempre en la fuente (enlace en cada título).</p>
 <div class="toast2" id="toast2" hidden role="status"></div>
 <nav class="tabs" id="tabs" aria-label="Vistas" hidden></nav>
@@ -396,16 +395,21 @@ function pintaCerca(){
 
 // ---------- mapa (Leaflet se descarga solo al abrir la pestaña "Mapa") ----------
 // Las baldosas públicas de OpenStreetMap sirven para pruebas y poco tráfico. Para producción, cambiar esta URL por un proveedor con plan gratuito.
-const TILES="https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+const TILES="https://tile.openstreetmap.org/{z}/{x}/{y}.png";   // respaldo si el fondo vectorial no carga
+const ESTILO_MAPA=()=>"https://tiles.openfreemap.org/styles/"+(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"positron");
 let MARCA_YO=null, CIRC_YO=null, TOAST_T=null;
 let MAPOBJ=null, CAPA=null, MARCA_POS=null, ESPERANDO=false, MARC={}, POR=new Map(), SINUBIC=0;
 function cargaLeaflet(cb){
   if(window.L){ cb(); return; }
   if(ESPERANDO) return; ESPERANDO=true;
   const l=document.createElement("link"); l.rel="stylesheet"; l.href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"; document.head.appendChild(l);
-  const s=document.createElement("script"); s.src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
-  s.onload=()=>{ESPERANDO=false; cb()}; s.onerror=()=>{ESPERANDO=false; document.getElementById("mapa").textContent="No se pudo cargar el mapa. Revisa tu conexión y vuelve a intentar."};
-  document.head.appendChild(s);
+  const l2=document.createElement("link"); l2.rel="stylesheet"; l2.href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"; document.head.appendChild(l2);
+  const carga=(src,ok,mal)=>{ const x=document.createElement("script"); x.src=src; x.onload=ok; x.onerror=mal; document.head.appendChild(x); };
+  carga("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
+    ()=>carga("https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js",
+      ()=>carga("https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js",()=>{ESPERANDO=false; cb()},()=>{ESPERANDO=false; cb()}),   // sin el fondo vectorial se usa el de respaldo
+      ()=>{ESPERANDO=false; cb()}),
+    ()=>{ESPERANDO=false; document.getElementById("mapa").textContent="No se pudo cargar el mapa. Revisa tu conexión y vuelve a intentar."});
 }
 function iconoPin(i,on){ const t=LUG[i].t||"otro", z=on?48:36;
   return L.divIcon({className:"pin"+(on?" sel":""), html:`<span class="pinb" style="--c:var(${tp(t).c});color:${tp(t).on}">${icoSvg(t,on?26:19)}</span>`, iconSize:[z,z], iconAnchor:[z/2,z/2]}); }
@@ -423,8 +427,10 @@ function dibujaMapa(rows){
     cont.textContent="";
     MAPOBJ=L.map(cont,{preferCanvas:true,zoomControl:false,attributionControl:false}).setView([-33.45,-70.65],11);
     if(!matchMedia("(pointer:coarse)").matches) L.control.zoom({position:"bottomright"}).addTo(MAPOBJ);   // en el celular se usa el pellizco
-    L.control.attribution({position:"topright",prefix:false}).addAttribution("© OpenStreetMap").addTo(MAPOBJ);
-    L.tileLayer(TILES,{maxZoom:19}).addTo(MAPOBJ);
+    L.control.attribution({position:"topright",prefix:false}).addAttribution('<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> Datos de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>').addTo(MAPOBJ);
+    let fondo=null;
+    try{ if(L.maplibreGL&&window.maplibregl){ fondo=L.maplibreGL({style:ESTILO_MAPA()}).addTo(MAPOBJ); matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>{ try{ fondo.getMaplibreMap().setStyle(ESTILO_MAPA()); }catch(_){} }); } }catch(_){ fondo=null; }
+    if(!fondo) L.tileLayer(TILES,{maxZoom:19}).addTo(MAPOBJ);
     CAPA=L.layerGroup().addTo(MAPOBJ);
     MAPOBJ.on("click",()=>{ if(state.sel!=null){ state.sel=null; estiloMarcas(); } state.hoja="peek"; pintaHoja(); });
   }
