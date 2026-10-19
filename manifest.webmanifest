@@ -1,0 +1,16 @@
+{
+  "name": "Agenda cultural Santiago",
+  "short_name": "Agenda cultural",
+  "description": "Los panoramas culturales de Santiago en un solo lugar: por fecha, precio y cercanía.",
+  "lang": "es-CL",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5EFE4",
+  "theme_color": "#B4472C",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
