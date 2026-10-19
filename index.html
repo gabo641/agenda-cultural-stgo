@@ -180,6 +180,12 @@ body.vsem #dias,body.vsem #toks{display:none}
 .sem .mas{width:100%;height:34px;border-radius:17px;border:1px dashed var(--mute);background:transparent;color:var(--ink);font:inherit;font-size:.78rem;cursor:pointer}.sem .vacio-d{font-size:.78rem;color:var(--mute)}
 .ficha-l{display:flex;gap:12px;align-items:flex-start;margin:6px 0 14px}.ficha-l h2{margin:0;font-family:ui-serif,Georgia,serif;font-weight:500;font-size:1.5rem;line-height:1.15}.ficha-l .acc2{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.ficha-l .acc2 button,.ficha-l .acc2 a{height:38px;padding:0 14px;border-radius:19px;font:inherit;font-weight:600;font-size:.88rem;display:inline-flex;align-items:center;text-decoration:none;cursor:pointer}.ficha-l .acc2 button{border:0;background:var(--sunk);color:var(--ink)}
 .back{height:36px;border:0;background:transparent;color:var(--acc2);font:inherit;font-weight:600;cursor:pointer;padding:0;margin-bottom:4px}
+
+.stub .cd{font-size:.62rem;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--mute);margin-top:4px;text-align:center;line-height:1.1;padding:0 4px}
+.timbre{display:inline-block;transform:rotate(-4deg);font-size:.7rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:3px 9px;border:3px double var(--acc);color:var(--acc);border-radius:4px;white-space:nowrap;background:transparent}
+.timbre.free{border-color:var(--olive);color:var(--olive)}.porconf{font-size:.72rem;font-style:italic;color:var(--mute);white-space:nowrap}
+.temp{height:4px;border-radius:2px;background:var(--sunk);overflow:hidden;margin:3px 0 1px;max-width:220px}.temp i{display:block;height:100%;background:var(--acc);border-radius:2px}
+.compacta .temp,.compacta .stub .cd{display:none}
 </style></head><body><div class="wrap">
 <header id="cab"><div class="eyebrow" id="semana"></div><h1>Cartelera</h1></header>
 <div id="controles">
@@ -630,6 +636,7 @@ const IC_COMP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7
 
 // ---------- tarjeta tipo entrada: talón con la fecha y la hora ----------
 const FUENTE_ESTRUCTURADA=new Set(['ticketplus','eventbrite','salak','vitacura','gam','m100','municipal','normandie','teatrooriente','teatrolaflorida']);
+const difDias=(a,b)=>Math.round((mk(a)-mk(b))/864e5);
 function tarjeta(row,i){
   const [e,dd,dist]=row, T=tp(e.k), [p,cl]=priceOf(e), L0=e.p!=null?LUG[e.p]:null, cal=datosCal(e,dd);
   const filtrando=EF.desde||EF.hasta, hdia=d=>(e.hm&&e.hm[d])||e.h||"";
@@ -639,12 +646,17 @@ function tarjeta(row,i){
   else { const fut=filtrando?dd.fechas:e.f.filter(d=>d>=HOY), d=fut[0]; const h=hdia(d);
     top=d===HOY?"Hoy":DIA[mk(d).getDay()]; big=String(+d.slice(8)); bot=h&&h!=="Varios horarios"?h.slice(0,5):(h?"varios horarios":MES[+d.slice(5,7)-1]);
     if(fut.length>1){ const hs=[...new Set(fut.map(hdia).filter(Boolean))]; detalle=`${fut.length} fechas · ${fut.slice(0,3).map(fmtD).join(" · ")}${fut.length>3?" …":""}`+(hs.length>1?` · <b class="hr">Varios horarios</b>`:""); } }
+  let cd="", temp="";
+  if(e.r){ const falta=difDias(e.r[1],HOY), dur=difDias(e.r[1],e.r[0]);
+    if(e.r[0]<=HOY&&falta>=0){ if(falta<=7) cd=falta===0?"Último día":"Últimos días";
+      if(dur>0&&dur<=400){ const pct=Math.max(2,Math.min(100,Math.round(100*(dur-falta)/dur))); temp=`<div class="temp" role="img" aria-label="La muestra va en ${pct}% de su temporada"><i style="width:${pct}%"></i></div>`+(falta<=14?`<div class="tkm">${falta===0?"Último día":"Quedan "+falta+" día"+(falta===1?"":"s")}</div>`:""); } } }
+  else { const d0=(filtrando?dd.fechas:e.f.filter(d=>d>=HOY))[0], n=d0?difDias(d0,HOY):0; if(n===1) cd="Mañana"; else if(n>=2&&n<=6) cd="En "+n+" días"; }
   const guardado=GUARD.has(e.u);
-  return `<article class="tk" style="--c:var(${T.c})"><div class="stub" aria-hidden="false"><span class="t">${top}</span><span class="g">${big}</span><span class="b">${esc(bot)}</span></div>
-  <div class="tkb"><div class="tkh"><span class="cat">${esc(CATS[e.c[0]]||"Panorama")}${hayPref()&&puntaje(e)>=2?'<span class="badge">✨ Para ti</span>':""}</span><span class="pill ${cl==="free"?"free":""}">${p}</span></div>
+  return `<article class="tk" style="--c:var(${T.c})"><div class="stub" aria-hidden="false"><span class="t">${top}</span><span class="g">${big}</span><span class="b">${esc(bot)}</span>${cd?`<span class="cd">${cd}</span>`:""}</div>
+  <div class="tkb"><div class="tkh"><span class="cat">${esc(CATS[e.c[0]]||"Panorama")}${hayPref()&&puntaje(e)>=2?'<span class="badge">✨ Para ti</span>':""}</span>${cl?`<span class="timbre ${cl}">${p}</span>`:`<span class="porconf">${p}</span>`}</div>
   <h3 class="tkt"><a href="${esc(e.u)}" target="_blank" rel="noopener">${esc(e.t)}</a></h3>
   <div class="tkv">${insignia(e.k,18)}${esc(e.l)}${dist!=null?` · <span class="dist">a ${kmTxt(dist)}</span>`:""}</div>
-  ${detalle?`<div class="tkm">${detalle}</div>`:""}
+  ${detalle?`<div class="tkm">${detalle}</div>`:""}${temp}
   ${FUENTE_ESTRUCTURADA.has(e.s)?"":`<div class="tkm conf">ⓘ Fecha leída de un texto: confírmala en la fuente</div>`}
   ${L0&&L0.md<=1500?`<div class="tkm">🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}</div>`:""}
   <div class="tka"><div class="izq"><a class="como" href="${comoLlegar(e)}" target="_blank" rel="noopener">Cómo llegar</a>
