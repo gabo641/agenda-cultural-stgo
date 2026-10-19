@@ -206,6 +206,7 @@ body.vsem #dias,body.vsem #toks{display:none}
 .thumb{width:76px;height:56px;flex:0 0 76px;border:0;border-radius:4px;background:var(--c);color:var(--on);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;padding:0;cursor:pointer}.thumb svg{width:70px;height:36px}
 .lrow h3{margin:0;font-family:ui-serif,Georgia,serif;font-weight:500;font-size:1rem;font-variant:small-caps;letter-spacing:.4px}.lrow .nombre{border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}.lrow .m{font-size:.76rem;color:var(--mute)}
 nav.conic button svg{width:28px;height:28px}
+.lnk{display:block;margin:10px 0 0;border:0;background:none;color:var(--acc2);font:inherit;font-size:.85rem;font-weight:600;padding:6px 0;cursor:pointer;text-align:left}
 </style></head><body><div class="wrap">
 <header id="cab"><div class="eyebrow" id="semana"></div><h1>Cartelera</h1></header>
 <div id="controles">
@@ -527,8 +528,9 @@ function pintaHoja(){
       <h3>${esc(L0.n)}</h3>
       <p class="sub2">${evs.length} panorama${evs.length>1?"s":""}${d!=null?` · a ${kmTxt(d)}`:""}${L0.md<=1500?` · 🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}`:""}</p>
       <ul>${evs.slice(0,6).map(([e,dd])=>{const [p,cl]=priceOf(e); return `<li><a href="${esc(e.u)}" target="_blank" rel="noopener"><span class="cuando">${infoFecha(e,dd)}</span><span class="tit">${esc(e.t)}</span><span class="pr price ${cl}">${p}</span></a></li>`}).join("")}${evs.length>6?`<li><span class="cuando">…y ${evs.length-6} más: míralos en la Cartelera</span></li>`:""}</ul>
-      <div class="acc"><a class="como" href="${GM}${L0.lat},${L0.lon}" target="_blank" rel="noopener">Cómo llegar</a><button class="sec" id="vercart" type="button">Ver en la cartelera</button></div></div>`;
+      <div class="acc"><a class="como" href="${GM}${L0.lat},${L0.lon}" target="_blank" rel="noopener">Cómo llegar</a><button class="sec" id="verficha" type="button">Ver ficha del lugar</button></div><button class="lnk" id="vercart" type="button">Ver solo este lugar en la Cartelera →</button></div>`;
     document.getElementById("atras").onclick=()=>{ state.sel=null; estiloMarcas(); pintaHoja(); };
+    document.getElementById("verficha").onclick=()=>{ state.ficha=state.sel; state.tab="lugares"; try{ history.replaceState(null,"","#lugar="+state.ficha); }catch(e){} render(); window.scrollTo(0,0); };
     document.getElementById("vercart").onclick=()=>{ state.lugar=state.sel; state.tab="cartelera"; render(); window.scrollTo(0,0); };
     return;
   }
