@@ -71,7 +71,8 @@ details.rango label{font-size:.85rem;color:var(--mute);display:flex;gap:6px;alig
 @media(min-width:760px){.tabs{left:50%;right:auto;bottom:16px;transform:translateX(-50%);width:300px;border:1px solid var(--line);border-radius:999px;padding:4px 10px}}
 /* ---- mapa con panel inferior ---- */
 #mapawrap{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--sunk);margin-bottom:8px}
-#mapa{position:absolute;inset:0}.leaflet-top.leaflet-right{margin-top:calc(var(--ctrlh,0px) + 2px)}.leaflet-control-attribution{font-size:.65rem}.leaflet-marker-icon:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:50%}
+#mapa{position:absolute;inset:0}.clu span{width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--bg);border:3px solid var(--bg);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.leaflet-top.leaflet-right{margin-top:calc(var(--ctrlh,0px) + 2px)}.leaflet-control-attribution{font-size:.65rem}.leaflet-marker-icon:focus-visible{outline:3px solid var(--ink);outline-offset:2px;border-radius:50%}
 .hoja{position:absolute;left:0;right:0;bottom:0;z-index:1100;max-height:min(64%,calc(100% - var(--ctrlh,140px) - 16px));display:flex;flex-direction:column;background:var(--surface);border-radius:22px 22px 0 0;box-shadow:0 -8px 24px rgba(29,26,22,.18);transform:translateY(calc(100% - 52px));transition:transform .25s ease}
 .hoja.abierta{transform:none}
 .asa{border:0;background:transparent;padding:10px 0 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;color:var(--mute);font:inherit}
@@ -143,7 +144,7 @@ details.cal>summary::-webkit-details-marker{display:none}
 .pill.free{background:color-mix(in srgb,var(--olive) 22%,var(--surface));color:var(--olive)}
 .tkt{font-family:ui-serif,"Iowan Old Style","Palatino Linotype",Georgia,serif;font-size:1.12rem;font-weight:500;line-height:1.2;padding-right:6px;margin:0}
 .tkt a{color:inherit;text-decoration:none}.tkt a:hover{text-decoration:underline}
-.tkv{font-size:.84rem;color:var(--mute)}.tkm{font-size:.78rem;color:var(--mute)}.tkv .dist{font-weight:600;color:var(--ink)}
+.tkv{font-size:.84rem;color:var(--mute)}.tkm{font-size:.78rem;color:var(--mute)}.tkm.conf{font-style:italic}.tkv .dist{font-weight:600;color:var(--ink)}
 .tka{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;margin-top:2px}
 .tka .izq{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}.tka .der{display:flex;align-items:center}
 .tka .como{margin-top:8px}.tka details.cal{margin-top:8px}
@@ -317,6 +318,13 @@ function pintaCuando(){
     b.onclick=()=>{ if(state.pos&&state.pos.tipo==="gps"){ state.pos=null; state.radio=null; state.orden="fecha"; render(); } else usarUbicacion(); };
     el.appendChild(b);
   }
+  if(MAPA && navigator.geolocation){
+    const hc=state.pos&&state.pos.tipo==="gps"&&state.desde===HOY&&state.hasta===HOY&&state.radio===3;
+    const b=document.createElement("button"); b.className="chip"; b.textContent="🕒 Hoy y cerca"; b.setAttribute("aria-pressed",!!hc);
+    b.onclick=()=>{ if(hc){ state.pos=null; state.radio=null; state.orden="fecha"; state.desde=null; state.hasta=null; render(); return; }
+      quitarDia(); state.desde=HOY; state.hasta=HOY; state.radio=3; if(state.pos&&state.pos.tipo==="gps"){ state.orden="cerca"; render(); } else usarUbicacion(); };
+    el.appendChild(b);
+  }
   const g=document.createElement("button"); g.className="chip"; g.textContent="Gratis"; g.setAttribute("aria-pressed",EF.free);
   g.onclick=()=>{ const p=interpretar(state.q); if(p.free) quitarPalabras(p.items.filter(i=>i.gratis).flatMap(i=>i.idx)); else state.precio=state.precio==="gratis"?"todos":"gratis"; render(); }; el.appendChild(g);
   const pt=document.createElement("button"); pt.className="chip"; pt.textContent="✨ Para ti"; pt.setAttribute("aria-pressed",state.paraTi);
@@ -407,7 +415,7 @@ function cargaLeaflet(cb){
   const carga=(src,ok,mal)=>{ const x=document.createElement("script"); x.src=src; x.onload=ok; x.onerror=mal; document.head.appendChild(x); };
   carga("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js",
     ()=>carga("https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js",
-      ()=>carga("https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js",()=>{ESPERANDO=false; cb()},()=>{ESPERANDO=false; cb()}),   // sin el fondo vectorial se usa el de respaldo
+      ()=>carga("https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js",()=>carga("https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js",()=>{ESPERANDO=false; cb()},()=>{ESPERANDO=false; cb()}),()=>{ESPERANDO=false; cb()}),   // sin el fondo vectorial se usa el de respaldo
       ()=>{ESPERANDO=false; cb()}),
     ()=>{ESPERANDO=false; document.getElementById("mapa").textContent="No se pudo cargar el mapa. Revisa tu conexión y vuelve a intentar."});
 }
@@ -418,20 +426,20 @@ function estiloMarcas(){
 }
 function selecciona(i){
   state.sel=i; state.hoja="media"; estiloMarcas();
-  const L0=LUG[i]; if(MAPOBJ) MAPOBJ.setView([L0.lat,L0.lon],Math.max(MAPOBJ.getZoom(),14),{animate:true});
+  const L0=LUG[i]; if(MAPOBJ) MAPOBJ.setView([L0.lat,L0.lon],Math.max(MAPOBJ.getZoom(),15),{animate:true});
   pintaHoja();
 }
 function dibujaMapa(rows){
   const cont=document.getElementById("mapa");
   if(!MAPOBJ){
     cont.textContent="";
-    MAPOBJ=L.map(cont,{preferCanvas:true,zoomControl:false,attributionControl:false}).setView([-33.45,-70.65],11);
+    MAPOBJ=L.map(cont,{maxZoom:19,preferCanvas:true,zoomControl:false,attributionControl:false}).setView([-33.45,-70.65],11);
     if(!matchMedia("(pointer:coarse)").matches) L.control.zoom({position:"bottomright"}).addTo(MAPOBJ);   // en el celular se usa el pellizco
     L.control.attribution({position:"topright",prefix:false}).addAttribution('<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> Datos de <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>').addTo(MAPOBJ);
     let fondo=null;
     try{ if(L.maplibreGL&&window.maplibregl){ fondo=L.maplibreGL({style:ESTILO_MAPA()}).addTo(MAPOBJ); matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>{ try{ fondo.getMaplibreMap().setStyle(ESTILO_MAPA()); }catch(_){} }); } }catch(_){ fondo=null; }
     if(!fondo) L.tileLayer(TILES,{maxZoom:19}).addTo(MAPOBJ);
-    CAPA=L.layerGroup().addTo(MAPOBJ);
+    CAPA=(L.markerClusterGroup?L.markerClusterGroup({maxClusterRadius:42,showCoverageOnHover:false,spiderfyOnMaxZoom:true,disableClusteringAtZoom:15,iconCreateFunction:c=>L.divIcon({className:"clu",html:`<span>${c.getChildCount()}</span>`,iconSize:[40,40]})}):L.layerGroup()).addTo(MAPOBJ);
     MAPOBJ.on("click",()=>{ if(state.sel!=null){ state.sel=null; estiloMarcas(); } state.hoja="peek"; pintaHoja(); });
   }
   setTimeout(()=>MAPOBJ.invalidateSize(),60);
@@ -592,6 +600,7 @@ const IC_GUARD='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l
 const IC_COMP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>';
 
 // ---------- tarjeta tipo entrada: talón con la fecha y la hora ----------
+const FUENTE_ESTRUCTURADA=new Set(['ticketplus','eventbrite','salak','vitacura','gam','m100','municipal','normandie','teatrooriente','teatrolaflorida']);
 function tarjeta(row,i){
   const [e,dd,dist]=row, T=tp(e.k), [p,cl]=priceOf(e), L0=e.p!=null?LUG[e.p]:null, cal=datosCal(e,dd);
   const filtrando=EF.desde||EF.hasta, hdia=d=>(e.hm&&e.hm[d])||e.h||"";
@@ -607,6 +616,7 @@ function tarjeta(row,i){
   <h3 class="tkt"><a href="${esc(e.u)}" target="_blank" rel="noopener">${esc(e.t)}</a></h3>
   <div class="tkv">${insignia(e.k,18)}${esc(e.l)}${dist!=null?` · <span class="dist">a ${kmTxt(dist)}</span>`:""}</div>
   ${detalle?`<div class="tkm">${detalle}</div>`:""}
+  ${FUENTE_ESTRUCTURADA.has(e.s)?"":`<div class="tkm conf">ⓘ Fecha leída de un texto: confírmala en la fuente</div>`}
   ${L0&&L0.md<=1500?`<div class="tkm">🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}</div>`:""}
   <div class="tka"><div class="izq"><a class="como" href="${comoLlegar(e)}" target="_blank" rel="noopener">Cómo llegar</a>
   <details class="cal"><summary>📅 Calendario</summary><div class="calmenu"><small>Se agrega: ${esc(cal.cuando)}</small><a href="${esc(urlGoogleCal(cal))}" target="_blank" rel="noopener">Google Calendar</a>${MAPA?`<button type="button" class="ics" data-i="${i}">Apple / Outlook (.ics)</button>`:""}</div></details></div>
