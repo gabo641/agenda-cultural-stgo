@@ -274,7 +274,7 @@ body.vesp #controles{display:none}
 .inm-ctl{display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px calc(14px + env(safe-area-inset-bottom))}.inm-ctl button{height:42px;min-width:96px;border-radius:21px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;cursor:pointer}.inm-ctl button:disabled{opacity:.35;cursor:default}.inm-hint{font-size:.72rem;color:var(--mute);text-align:center;flex:1;max-width:190px}
 .inm .tambor{position:relative;height:min(52vh,360px);perspective:1100px;overflow:hidden}
 .inm .cil{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d}
-.inm .rt{position:absolute;left:-125px;top:-115px;width:250px;height:230px;display:flex;background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);backface-visibility:hidden;
+.inm .rt{position:absolute;left:-125px;top:-135px;width:250px;height:270px;display:flex;background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);backface-visibility:hidden;
  -webkit-mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000),radial-gradient(circle 9px at 0 100%,#0000 98%,#000),radial-gradient(circle 9px at 100% 0,#0000 98%,#000),radial-gradient(circle 9px at 100% 100%,#0000 98%,#000);-webkit-mask-composite:source-in;
  mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000),radial-gradient(circle 9px at 0 100%,#0000 98%,#000),radial-gradient(circle 9px at 100% 0,#0000 98%,#000),radial-gradient(circle 9px at 100% 100%,#0000 98%,#000);mask-composite:intersect}
 .inm .rt::before{content:"";position:absolute;left:0;top:10px;bottom:10px;border-left:2px dashed var(--mute);opacity:.55}.inm .rt::after{content:"";position:absolute;right:0;top:10px;bottom:10px;border-right:2px dashed var(--mute);opacity:.55}
@@ -314,6 +314,11 @@ body.vesp #controles{display:none}
 .pista .ibtn{width:34px;height:34px}
 .play{display:flex;align-items:center;gap:8px;margin-top:7px;max-width:260px;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;color:var(--mute)}.play .tl{position:relative;flex:1;height:4px;border-radius:2px;background:var(--line)}.play .tl i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--c)}.play .tl b{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 25%,transparent)}
 .mini.vinilo{background:#F5EFE4}.mini.vinilo::before{content:"";position:absolute;left:12px;top:8px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#B4472C 0 7px,#101010 8px)}.mini.vinilo::after{content:"";position:absolute;left:64px;top:14px;right:10px;height:6px;border-radius:3px;background:#1D1A16;box-shadow:0 12px 0 -1px #1D1A16,0 24px 0 -1px #B4472C}
+.inm .rt .fe{height:68px}.inm .rt .fe .cd{font-size:.58rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mute);margin-top:2px}
+.inm .rt .in{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 15%,var(--surface)) 0 74px,var(--surface) 74px)}
+.inm .rt .temp{width:100%;max-width:170px;height:4px;border-radius:2px;background:var(--sunk);overflow:hidden;margin-top:4px}.inm .rt .temp i{display:block;height:100%;background:var(--acc)}
+.inm .rt .q{font-size:.66rem;color:var(--mute)}.inm .rt .q.conf{font-style:italic;line-height:1.2}
+.inm .rt .sl{margin-top:auto;padding-top:4px}.inm .rt .sl .timbre{font-size:.64rem;padding:2px 8px}
 </style></head><body><div class="wrap">
 <header id="cab"><div id="hero" class="hero" hidden></div><div class="eyebrow" id="semana"></div><h1 id="titulo">Cartelera</h1></header>
 <div id="controles">
@@ -882,7 +887,11 @@ function datosInm(r){
   let top,big,bot;
   if(e.r){ const futuro=e.r[0]>HOY, f=futuro?e.r[0]:e.r[1]; top=futuro?"Desde":"Hasta"; big=String(+f.slice(8)); bot=MES[+f.slice(5,7)-1]; }
   else { const d=fut[0], h=(e.hm&&e.hm[d])||e.h||""; top=d===HOY?"Hoy":DIA[mk(d).getDay()]; big=String(+d.slice(8)); bot=h&&h!=="Varios horarios"?h.slice(0,5):(h?"varios horarios":MES[+d.slice(5,7)-1]); }
-  return {e,top,big,bot,c:`var(${T.c})`,cat:CATS[e.c[0]]||"Panorama",precio:p,lugar:e.l};
+  const [,cl]=priceOf(e); let cd="", pct=null, quedan=null;
+  if(e.r){ const falta=difDias(e.r[1],HOY), dur=difDias(e.r[1],e.r[0]);
+    if(e.r[0]<=HOY&&falta>=0){ if(falta<=7) cd=falta===0?"Último día":"Últimos días"; if(dur>0&&dur<=400){ pct=Math.max(2,Math.min(100,Math.round(100*(dur-falta)/dur))); if(falta<=14) quedan=falta===0?"Último día":"Quedan "+falta+" día"+(falta===1?"":"s"); } } }
+  else { const n=difDias(fut[0],HOY); if(n===1) cd="Mañana"; else if(n>=2&&n<=6) cd="En "+n+" días"; }
+  return {e,top,big,bot,c:`var(${T.c})`,cat:CATS[e.c[0]]||"Panorama",precio:p,cl,lugar:e.l,cd,pct,quedan,conf:!FUENTE_ESTRUCTURADA.has(e.s)};
 }
 const MANCHA_INM=i=>`<svg viewBox="0 0 128 128" aria-hidden="true"><g style="filter:url(#rugi);fill:var(--c)"><path d="M18 52 C14 24 44 10 68 18 C96 24 118 44 108 74 C100 100 70 116 44 104 C24 96 22 70 18 52Z" opacity=".95"/><path d="M${60+(i%5)*3} 96 C70 110 62 124 54 120 C46 112 54 104 60 96Z" opacity=".9"/><circle cx="${100-(i%5)*4}" cy="104" r="5" opacity=".85"/></g></svg>`;
 function abrirInm(){
@@ -911,7 +920,7 @@ function montaInm(){
   const esc2=document.getElementById("inm-esc"), R=INM.rows;
   document.getElementById("inm-hint").textContent=INM.modo==="rollo"?"Desliza: el rollo gira":"Desliza: caminas por la galería";
   if(INM.modo==="rollo"){
-    esc2.innerHTML=`<div class="tambor"><div class="spool i"></div><div class="spool d"></div><div class="cil" id="inm-cil">`+R.map((d,i)=>`<article class="rt" data-i="${i}" style="--c:${d.c}"><div class="in"><div class="fe"><span class="t">${esc(d.top)}</span><span class="g">${d.big}</span></div><span class="cat">${esc(d.cat)}</span><h3>${esc(d.e.t)}</h3><div class="h">${esc(d.bot)}</div><div class="v">${esc(d.lugar)}</div><div class="pr">${esc(d.precio)}</div></div></article>`).join("")+`</div><div class="carr" id="inm-car"><div class="rail" id="inm-rail"></div></div></div>`;
+    esc2.innerHTML=`<div class="tambor"><div class="spool i"></div><div class="spool d"></div><div class="cil" id="inm-cil">`+R.map((d,i)=>`<article class="rt" data-i="${i}" style="--c:${d.c}"><div class="in"><div class="fe"><span class="t">${esc(d.top)}</span><span class="g">${d.big}</span>${d.cd?`<span class="cd">${esc(d.cd)}</span>`:""}</div><span class="cat">${esc(d.cat)}</span><h3>${esc(d.e.t)}</h3>${d.e.r?"":`<div class="h">${esc(d.bot)}</div>`}<div class="v">${esc(d.lugar)}</div>${d.pct!=null?`<div class="temp" role="img" aria-label="La muestra va en ${d.pct}% de su temporada"><i style="width:${d.pct}%"></i></div>${d.quedan?`<div class="q">${esc(d.quedan)}</div>`:""}`:""}${d.conf?`<div class="q conf">ⓘ Confirma la fecha en la fuente</div>`:""}<div class="sl">${d.cl?`<span class="timbre ${d.cl}">${esc(d.precio)}</span>`:`<span class="porconf">${esc(d.precio)}</span>`}</div></div></article>`).join("")+`</div><div class="carr" id="inm-car"><div class="rail" id="inm-rail"></div></div></div>`;
     const car=document.getElementById("inm-car"), rail=document.getElementById("inm-rail"), w=car.clientWidth; INM.step=Math.min(250,w*.62);
     rail.innerHTML=`<div class="pa" style="width:${(w-INM.step)/2}px"></div>`+R.map(()=>`<div class="pa" style="width:${INM.step}px"></div>`).join("")+`<div class="pa" style="width:${(w-INM.step)/2}px"></div>`;
     INM.rad=INM.step/(2*Math.sin(INM.ang*Math.PI/360)); document.getElementById("inm-cil").style.transform=`translateZ(${-INM.rad}px)`;
