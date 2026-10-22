@@ -295,6 +295,25 @@ body.vesp #controles{display:none}
 .inm .lz .cart .cat{font-size:.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mute)}.inm .lz .cart h3{margin:1px 0;font-weight:500;font-size:1rem;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.inm .lz .cart .v{font-size:.74rem;color:var(--mute)}.inm .lz .cart .pr{font-size:.64rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--acc)}
 .btn-exp{height:36px;padding:0 14px;border-radius:19px;border:1px dashed var(--mute);background:transparent;color:var(--ink);font:inherit;font-size:.85rem;font-weight:700;cursor:pointer}
 @media(prefers-reduced-motion:reduce){.inm .carr,.inm .gscroll{scroll-behavior:auto}}
+
+/* ---- skin Vinilo ---- */
+.hero.disco{background:transparent;height:150px;display:flex;align-items:center;justify-content:center}
+.hero.disco .lp{width:136px;height:136px;border-radius:50%;background:radial-gradient(circle,#0000 0 29%,#000 29.3%),repeating-radial-gradient(circle,#1a1a1a 0 2px,#101010 2px 4px);box-shadow:0 0 0 3px #0b0b0b,0 10px 24px #0007;animation:gira 6s linear infinite;position:relative}
+.hero.disco .lp::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg,#fff0 0 8%,#ffffff22 12%,#fff0 18% 50%,#ffffff1c 62%,#fff0 70%)}
+.hero.disco .lp::after{content:"";position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px;border-radius:50%;background:radial-gradient(circle,#101010 0 4px,var(--acc) 5px);border:3px solid #0b0b0b}
+.hero.disco .tit{left:0;bottom:2px;z-index:2}.hero.disco .tit small,.hero.disco .tit b{color:var(--ink)}.hero.disco .tit b{font-size:1.5rem}
+:root[data-skin=vinilo] #cab.conhero #titulo{display:none}
+.cara{display:flex;align-items:center;gap:10px;margin:14px 0 4px;font-size:.72rem;font-weight:800;letter-spacing:2.2px;text-transform:uppercase;color:var(--mute)}.cara::before,.cara::after{content:"";flex:1;border-top:1px solid var(--line)}
+.pista{display:flex;align-items:flex-start;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.pista .num{font-family:ui-monospace,Menlo,monospace;font-size:.95rem;color:var(--c);width:26px;flex:0 0 26px;padding-top:2px;font-weight:700}
+.pista .pc{flex:1;min-width:0}.pista .l1{display:flex;align-items:baseline;gap:8px}.pista h3{margin:0;font-family:ui-serif,Georgia,serif;font-weight:500;font-size:1.1rem;line-height:1.2}.pista h3 a{color:inherit;text-decoration:none}.pista h3 a:hover{text-decoration:underline}
+.pista .lead{flex:1;border-bottom:2px dotted var(--mute);opacity:.5;transform:translateY(-4px);min-width:14px}.pista .hr{font-family:ui-monospace,Menlo,monospace;font-size:.84rem;font-weight:700;white-space:nowrap}
+.pista .v,.pista .n{font-size:.8rem;color:var(--mute);margin-top:1px}.pista .n.conf{font-style:italic}
+.pista .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px}.pista .meta .como{height:32px;padding:0 13px;font-size:.78rem;display:inline-flex;align-items:center;line-height:1}.pista .meta details.cal{margin:0}.pista .meta details.cal summary{height:32px;display:inline-flex;align-items:center;padding:0 8px}
+.pista .tag{font-size:.64rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:var(--c);color:var(--on)}.pista .tag.f{background:transparent;border:1.5px solid var(--olive);color:var(--olive)}
+.pista .ibtn{width:34px;height:34px}
+.play{display:flex;align-items:center;gap:8px;margin-top:7px;max-width:260px;font-family:ui-monospace,Menlo,monospace;font-size:.7rem;color:var(--mute)}.play .tl{position:relative;flex:1;height:4px;border-radius:2px;background:var(--line)}.play .tl i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--c)}.play .tl b{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 25%,transparent)}
+.mini.vinilo{background:#F5EFE4}.mini.vinilo::before{content:"";position:absolute;left:12px;top:8px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,#B4472C 0 7px,#101010 8px)}.mini.vinilo::after{content:"";position:absolute;left:64px;top:14px;right:10px;height:6px;border-radius:3px;background:#1D1A16;box-shadow:0 12px 0 -1px #1D1A16,0 24px 0 -1px #B4472C}
 </style></head><body><div class="wrap">
 <header id="cab"><div id="hero" class="hero" hidden></div><div class="eyebrow" id="semana"></div><h1 id="titulo">Cartelera</h1></header>
 <div id="controles">
@@ -755,6 +774,26 @@ const IC_COMP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7
 // ---------- tarjeta tipo entrada: talón con la fecha y la hora ----------
 const FUENTE_ESTRUCTURADA=new Set(['ticketplus','eventbrite','salak','vitacura','gam','m100','municipal','normandie','teatrooriente','teatrolaflorida']);
 const difDias=(a,b)=>Math.round((mk(a)-mk(b))/864e5);
+
+// ---------- skin Vinilo: cada panorama es una pista del disco ----------
+function pistaVinilo(o){
+  const {e,dist,T,p,cl,L0,cal,top,big,bot,cd,i,guardado}=o;
+  const hr=e.r?`${top.toLowerCase()} ${big} ${bot}`:(/^\d/.test(bot)?`${top.toLowerCase()} ${big} · ${bot}`:`${top.toLowerCase()} ${big} ${bot}`);
+  let play="";
+  if(e.r&&e.r[0]<=HOY){ const dur=difDias(e.r[1],e.r[0]), falta=difDias(e.r[1],HOY), dia=difDias(HOY,e.r[0])+1;
+    if(dur>0&&dur<=400&&falta>=0){ const pct=Math.max(2,Math.min(100,Math.round(100*(dur-falta)/dur))); play=`<div class="play" role="img" aria-label="Va en el día ${dia} de ${dur+1}; quedan ${falta} días"><span>día ${dia}</span><div class="tl"><i style="width:${pct}%"></i><b style="left:${pct}%"></b></div><span>-${falta} d</span></div>`; } }
+  const nota=[cd, L0&&L0.md<=1500?`🚇 ~${kmTxt(L0.md)} del Metro ${esc(L0.m)}`:"", dist!=null?`a ${kmTxt(dist)}`:""].filter(Boolean).join(" · ");
+  const conf=FUENTE_ESTRUCTURADA.has(e.s)?"":`<div class="n conf">ⓘ Fecha leída de un texto: confírmala en la fuente</div>`;
+  return `<article class="pista" style="--c:var(${T.c});--on:${T.on}"><span class="num">${String(i+1).padStart(2,"0")}</span><div class="pc">
+   <div class="l1"><h3><a href="${esc(e.u)}" target="_blank" rel="noopener">${esc(e.t)}</a></h3><span class="lead"></span><span class="hr">${esc(hr)}</span></div>
+   <div class="v">${esc(CATS[e.c[0]]||"Panorama")} · ${esc(e.l)}${hayPref()&&puntaje(e)>=2?' · <b class="badge">✨ Para ti</b>':""}</div>
+   ${nota?`<div class="n">${nota}</div>`:""}${conf}${play}
+   <div class="meta">${cl?`<span class="tag ${cl==="free"?"f":""}">${p}</span>`:`<span class="porconf">${p}</span>`}<a class="como" href="${comoLlegar(e)}" target="_blank" rel="noopener">Cómo llegar</a>
+   <details class="cal"><summary>📅</summary><div class="calmenu"><small>Se agrega: ${esc(cal.cuando)}</small><a href="${esc(urlGoogleCal(cal))}" target="_blank" rel="noopener">Google Calendar</a>${MAPA?`<button type="button" class="ics" data-i="${i}">Apple / Outlook (.ics)</button>`:""}</div></details>
+   <button type="button" class="ibtn gd" data-u="${esc(e.u)}" aria-pressed="${guardado}" aria-label="${guardado?"Quitar de guardados":"Guardar panorama"}">${IC_GUARD}</button><button type="button" class="ibtn cp" data-i="${i}" aria-label="Compartir">${IC_COMP}</button></div>
+  </div></article>`;
+}
+
 function tarjeta(row,i){
   const [e,dd,dist]=row, T=tp(e.k), [p,cl]=priceOf(e), L0=e.p!=null?LUG[e.p]:null, cal=datosCal(e,dd);
   const filtrando=EF.desde||EF.hasta, hdia=d=>(e.hm&&e.hm[d])||e.h||"";
@@ -770,6 +809,7 @@ function tarjeta(row,i){
       if(dur>0&&dur<=400){ const pct=Math.max(2,Math.min(100,Math.round(100*(dur-falta)/dur))); temp=`<div class="temp" role="img" aria-label="La muestra va en ${pct}% de su temporada"><i style="width:${pct}%"></i></div>`+(falta<=14?`<div class="tkm">${falta===0?"Último día":"Quedan "+falta+" día"+(falta===1?"":"s")}</div>`:""); } } }
   else { const d0=(filtrando?dd.fechas:e.f.filter(d=>d>=HOY))[0], n=d0?difDias(d0,HOY):0; if(n===1) cd="Mañana"; else if(n>=2&&n<=6) cd="En "+n+" días"; }
   const guardado=GUARD.has(e.u);
+  if(state.skin==="vinilo") return pistaVinilo({e,dd,dist,T,p,cl,L0,cal,top,big,bot,detalle,cd,i,guardado});
   return `<article class="tk" style="--c:var(${T.c})"><div class="stub" aria-hidden="false"><span class="t">${top}</span><span class="g">${big}</span><span class="b">${esc(bot)}</span>${cd?`<span class="cd">${cd}</span>`:""}</div>
   <div class="tkb"><div class="tkh"><span class="cat">${esc(CATS[e.c[0]]||"Panorama")}${hayPref()&&puntaje(e)>=2?'<span class="badge">✨ Para ti</span>':""}</span>${cl?`<span class="timbre ${cl}">${p}</span>`:`<span class="porconf">${p}</span>`}</div>
   <h3 class="tkt"><a href="${esc(e.u)}" target="_blank" rel="noopener">${esc(e.t)}</a></h3>
@@ -789,7 +829,7 @@ document.getElementById("list").addEventListener("click",ev=>{
 
 
 // ---------- skins (apariencia elegida; se guarda solo en este navegador) ----------
-const SKINS=[["boleto","Boleto","Papel cálido y entrada clásica"],["lienzo","Lienzo","Tela con grano y pinceladas"],["telon","Telón","Cenefa dorada y terciopelo"]];
+const SKINS=[["boleto","Boleto","Papel cálido y entrada clásica"],["vinilo","Vinilo","Lista de pistas, con disco"],["lienzo","Lienzo","Tela con grano y pinceladas"],["telon","Telón","Cenefa dorada y terciopelo"]];
 function aplicaSkin(s){ if(!SKINS.some(x=>x[0]===s)) s="boleto"; state.skin=s; if(s==="boleto") delete document.documentElement.dataset.skin; else document.documentElement.dataset.skin=s; try{ localStorage.setItem("pc_skin",s); }catch(e){} }
 try{ aplicaSkin(localStorage.getItem("pc_skin")||"boleto"); }catch(e){ aplicaSkin("boleto"); }
 
@@ -801,13 +841,13 @@ function pintaHero(){
   const h=document.getElementById("hero"), cab=document.getElementById("cab");
   const enCart=!MAPA||state.tab==="cartelera";
   let clave="", datos=null;
-  if(enCart){ const c=HERO_CAT[EF.cat]; if(c) datos=c; else if(state.skin==="lienzo") datos=["lienzo","Esta semana","Cartelera"]; else if(state.skin==="telon") datos=["teatro","Esta semana","Cartelera"]; }
+  if(enCart){ const c=HERO_CAT[EF.cat]; if(c) datos=c; else if(state.skin==="vinilo") datos=["disco","Lado A","Cartelera"]; else if(state.skin==="lienzo") datos=["lienzo","Esta semana","Cartelera"]; else if(state.skin==="telon") datos=["teatro","Esta semana","Cartelera"]; }
   clave=datos?datos.join("|"):"";
   cab.classList.toggle("conhero",!!datos); h.hidden=!datos;
   if(clave===HERO_KEY) return; HERO_KEY=clave;
   if(!datos){ h.innerHTML=""; h.className="hero"; return; }
   const [clase,peq,tit]=datos; h.className="hero "+clase;
-  h.innerHTML=clase==="musica"?`<div class="brazo"></div><div class="vinilo"></div><div class="tit"><small>${peq}</small><b>${tit}</b></div>`
+  h.innerHTML=clase==="disco"?`<div class="lp" aria-hidden="true"></div><div class="tit"><small>${peq}</small><b>${tit}</b></div>`:clase==="musica"?`<div class="brazo"></div><div class="vinilo"></div><div class="tit"><small>${peq}</small><b>${tit}</b></div>`
    :clase==="teatro"?`<div class="cenefa"></div><div class="cort i"></div><div class="cort d"></div><div class="escena"><div><small>${peq}</small><b>${tit}</b></div></div>`
    :TRAZOS+`<div class="tit"><small>${peq}</small><b><span>${tit}</span></b></div>`;
   if(clase==="teatro") setTimeout(()=>h.classList.add("abierto"),500);
@@ -1046,7 +1086,7 @@ function render(){
     return; }
   const shows=rows.filter(r=>!r[0].r), cart=rows.filter(r=>r[0].r);
   FILAS=[...shows,...cart]; ROWS_ACT=FILAS;
-  const sec=(tit,sub,lista,off)=>lista.length?`<div class="sec-h"><h2>${tit}</h2><p>${sub}</p></div>`+lista.map((r,k)=>tarjeta(r,off+k)).join(""):"";
+  const sec=(tit,sub,lista,off)=>lista.length?(state.skin==="vinilo"?`<div class="cara">${off===0?"Cara A · Funciones":"Cara B · Siempre en cartelera"}</div>`:`<div class="sec-h"><h2>${tit}</h2><p>${sub}</p></div>`)+lista.map((r,k)=>tarjeta(r,off+k)).join(""):"";
   let html=sec("Funciones y <i>shows</i>",`${shows.length} con fecha y hora`,shows,0)+sec("Siempre en <i>cartelera</i>",`${cart.length} exposiciones y temporadas abiertas`,cart,shows.length);
   if(!rows.length) html=`<div class="vacio"><h3>Telón abajo</h3><p>${state.soloGuard?"Aún no guardas panoramas. Toca el marcador de una tarjeta para guardarlo.":"No encontramos nada con esa combinación. Prueba otro día o quita algún filtro."}</p><button type="button" class="chip" id="resetvacio">Ver todo lo próximo</button></div>`;
   document.getElementById("list").innerHTML=html;
