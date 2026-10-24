@@ -394,8 +394,9 @@ body.vesp #controles{display:none}
 @media(prefers-reduced-motion:reduce){.jb-pagina.sale,.jb-pagina.entra{animation:none}}
 .mini.jukebox{background:linear-gradient(135deg,#b9bdb0,#d9dccf,#a9ae9f)}.mini.jukebox::before{content:"";position:absolute;left:10px;right:10px;top:8px;bottom:8px;background:#14110e;border-radius:4px}.mini.jukebox::after{content:"";position:absolute;left:16px;right:16px;top:14px;height:7px;background:#f6d9a0;box-shadow:0 12px 0 #f6d9a0,0 24px 0 #f6d9a0}
 .marca{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 10px}.marca span{font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-weight:600;font-size:.82rem;letter-spacing:.2em;text-transform:uppercase}.marca small{font-size:.74rem;color:var(--mute)}
+.marca .mk{width:24px;height:24px;display:inline-block;align-self:center;flex:0 0 24px}.marca .mk svg{width:100%;height:100%;display:block}
 </style></head><body><div class="wrap">
-<header id="cab"><div class="marca"><span>Tercera Llamada</span><small>qué hay hoy en Santiago</small></div><div id="hero" class="hero" hidden></div><div class="eyebrow" id="semana"></div><h1 id="titulo">Cartelera</h1></header>
+<header id="cab"><div class="marca"><i class="mk" id="mk" aria-hidden="true"></i><span>Tercera Llamada</span><small>qué hay hoy en Santiago</small></div><div id="hero" class="hero" hidden></div><div class="eyebrow" id="semana"></div><h1 id="titulo">Cartelera</h1></header>
 <div id="controles">
 <div class="fila-busca"><label class="busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="¿Qué quieres vivir? Ej: jazz el viernes" aria-label="Buscar"></label>
 <button class="btn-filtros" id="btnfiltros" type="button" aria-label="Abrir filtros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span class="n" id="nfiltros" hidden></span></button></div>
@@ -1095,6 +1096,23 @@ function pintaJukebox(filas){
 }
 addEventListener("resize",()=>{ if(state.skin==="jukebox"&&state.tab==="cartelera"&&JB.sig&&!JB.sig.endsWith("|"+jbPorHoja())) render(); });
 
+
+// ---------- marca: el logo cambia con el skin (y el ícono de la pestaña) ----------
+const MARCAS={
+  boleto:(a,b)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M24 26H33a7 7 0 0 0 14 0H96a10 10 0 0 1 10 10V84a10 10 0 0 1-10 10H47a7 7 0 0 0-14 0H24a10 10 0 0 1-10-10V36a10 10 0 0 1 10-10z" fill="${a}"/><path d="M40 40V80" stroke="${b}" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round" opacity=".8"/><text x="73" y="72" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-weight="600" font-size="34" fill="${b}">III</text><text x="27" y="66" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-size="11" fill="${b}" opacity=".85" transform="rotate(-90 27 60)">N.º</text></svg>`,
+  arco:(a,b)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="${a}" stroke-linecap="round"><path d="M18 102V60a42 42 0 0 1 84 0V102" stroke-width="7"/><path d="M33 102V62a27 27 0 0 1 54 0V102" stroke-width="6" opacity=".8"/><path d="M47 102V64a13 13 0 0 1 26 0V102" stroke-width="5" opacity=".6"/></g><rect x="12" y="100" width="96" height="7" rx="3.5" fill="${a}"/></svg>`,
+  telon:(a,b)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="14" y="18" width="92" height="12" rx="3" fill="${a}"/><path d="M18 30H49Q44 70 40 104H18z" fill="${a}"/><path d="M102 30H71Q76 70 80 104H102z" fill="${a}"/><path d="M30 36Q30 70 28 100" stroke="${b}" stroke-width="2" fill="none" opacity=".5"/><path d="M90 36Q90 70 92 100" stroke="${b}" stroke-width="2" fill="none" opacity=".5"/><path d="M60 40l6 14 15 1.5-11.5 10 3.5 14.5-13-8-13 8 3.5-14.5L39 55.500 54 54z" fill="${a}"/></svg>`,
+  monograma:(a,b)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="46" fill="none" stroke="${a}" stroke-width="5"/><circle cx="60" cy="60" r="38" fill="none" stroke="${a}" stroke-width="1.5" stroke-dasharray="2 4"/><text x="45" y="77" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-weight="700" font-size="50" fill="${a}">T</text><text x="76" y="80" text-anchor="middle" font-family="ui-serif,Georgia,serif" font-weight="700" font-size="44" fill="${a}" opacity=".85">L</text></svg>`,
+  golpes:(a,b)=>`<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="14" y="30" width="92" height="64" rx="13" fill="${a}"/><g fill="${b}"><rect x="28" y="62" width="10" height="20" rx="5"/><rect x="44" y="52" width="10" height="30" rx="5"/><rect x="60" y="42" width="10" height="40" rx="5"/></g><path d="M79 54a12 12 0 0 1 0 20" stroke="${b}" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M89 46a22 22 0 0 1 0 36" stroke="${b}" stroke-width="3.5" stroke-linecap="round" fill="none" opacity=".7"/></svg>`
+};
+const MARCA_SKIN={boleto:"boleto",vinilo:"golpes",jukebox:"golpes",lienzo:"arco",claro:"monograma",afiche:"monograma",telon:"telon"};
+function pintaMarca(){
+  const k=MARCA_SKIN[state.skin]||"boleto", mk=document.getElementById("mk"); if(!mk) return;
+  mk.innerHTML=MARCAS[k](css("--acc")||"#B4472C", css("--bg")||"#F5EFE4");
+  try{ let l=document.querySelector('link[rel="icon"]'); if(!l){ l=document.createElement("link"); l.rel="icon"; document.head.appendChild(l); }
+    l.type="image/svg+xml"; l.href="data:image/svg+xml,"+encodeURIComponent(MARCAS[k]("#B4472C","#FFFBF4").replace("<svg ",'<svg xmlns="http://www.w3.org/2000/svg" ')); }catch(e){}
+}
+
 // ---------- hora del día (solo eventos con hora confirmada) ----------
 const FRANJAS=[["m","Hasta el mediodía",0,12*60],["t","Tarde",12*60,19*60],["n","Noche",19*60,24*60]];
 const iniMin=h=>{ const x=horaDe(h); return x?x.h*60+x.m:null; };
@@ -1227,7 +1245,7 @@ function render(){
   const cEl=document.getElementById("count");
   cEl.innerHTML=`<span class="num">${rows.length}</span> panorama${rows.length===1?"":"s"}${esc(ventana)}${esc(radioTxt)}`+(sinUbic?` · ${sinUbic} sin ubicación precisa no se incluyen`:"")+(state.soloGuard?" · solo guardados":"")+(state.lugar!=null?" · en "+esc(LUG[state.lugar].n):"");
   document.getElementById("aplicar").textContent=`Ver ${rows.length} panorama${rows.length===1?"":"s"}`;
-  pintaHero();
+  pintaHero(); pintaMarca();
   const ve=MAPA&&state.tab==="espacio"; document.body.classList.toggle("vesp",ve);
   if(ve){ document.body.classList.remove("vmapa","vlug","vsem"); document.getElementById("mapawrap").hidden=true; document.getElementById("lugares").hidden=true; const L=document.getElementById("list"); L.hidden=false; L.classList.remove("compacta"); L.innerHTML=espacioHTML(); bindEspacio(); return; }
   const vm=MAPA&&state.tab==="mapa", enLug=MAPA&&state.tab==="lugares", vf=enLug&&state.ficha!=null, vl=enLug&&!vf;
